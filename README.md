@@ -1,2 +1,5 @@
 # Personal homepage test 개인 홈페이지 테스트
-## 주소: https://alstn1339.github.io/
+## address: www.kevalsil.com
+
+If you can't connect, please connect to that address.
+(https://alstn1339.github.io/)
