@@ -4,6 +4,82 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 */
 
+document.addEventListener('DOMContentLoaded', function() {
+    // 보이지 않는 li 요소의 시작 인덱스
+    var startIndex = 3;
+
+    // 모든 li 요소 가져오기
+    var listItems = document.querySelectorAll('#ul-web li');
+
+    // 숨겨진 li 요소 숨기기
+    for (var i = startIndex; i < listItems.length; i++) {
+        listItems[i].style.display = 'none';
+    }
+	document.getElementById('button-seeless-web').style.display = 'none';
+
+    // "See More" 버튼 클릭 시 추가적인 li 요소 보이기
+    document.getElementById('button-seemore-web').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'list-item';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seeless-web').style.display = 'block';
+    });
+
+	// "See Less" 버튼 클릭 시 추가적인 li 요소 숨기기
+    document.getElementById('button-seeless-web').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'none';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seemore-web').style.display = 'block';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 보이지 않는 li 요소의 시작 인덱스
+    var startIndex = 3;
+
+    // 모든 li 요소 가져오기
+    var listItems = document.querySelectorAll('#ul-sw li');
+
+    // 숨겨진 li 요소 숨기기
+    for (var i = startIndex; i < listItems.length; i++) {
+        listItems[i].style.display = 'none';
+    }
+	document.getElementById('button-seeless-sw').style.display = 'none';
+
+    // "See More" 버튼 클릭 시 추가적인 li 요소 보이기
+    document.getElementById('button-seemore-sw').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'list-item';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seeless-sw').style.display = 'block';
+    });
+
+	// "See Less" 버튼 클릭 시 추가적인 li 요소 숨기기
+    document.getElementById('button-seeless-sw').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'none';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seemore-sw').style.display = 'block';
+    });
+});
+
 (function($) {
 
 	var	$window = $(window),
