@@ -2827,17 +2827,17 @@ input, select, textarea {
 		-webkit-justify-content: center;
 		-ms-justify-content: center;
 		justify-content: center;
-		width: calc(100% + 2em);
-		margin: 0 0 3em -2em;
+		width: calc(100%);
+		margin: 0 0 0 0;
 		padding: 0;
 		list-style: none;
 	}
 
 		.features li {
-			width: calc(33.33333% - 2em);
-			margin-left: 2em;
-			margin-top: 3em;
-			padding: 0;
+			width: calc(33.33333%);
+			margin-left: 0em;
+			margin-top: 0em;
+			padding: 5px;
 		}
 
 			.features li:nth-child(1), .features li:nth-child(2), .features li:nth-child(3) {
@@ -2889,7 +2889,8 @@ input, select, textarea {
 			.image-container:hover .overlay {
 				opacity: 1; /* 마우스를 올렸을 때 투명도를 1로 변경하여 보이도록 함 */
 			}
-
+		
+		/*
 		@media screen and (max-width: 980px) {
 
 			.features li {
@@ -2919,7 +2920,7 @@ input, select, textarea {
 						margin-top: 2em;
 					}
 
-		}
+		}*/
 
 /* Statistics */
 
