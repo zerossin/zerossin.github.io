@@ -2889,6 +2889,9 @@ input, select, textarea {
 			.image-container:hover .overlay {
 				opacity: 1; /* 마우스를 올렸을 때 투명도를 1로 변경하여 보이도록 함 */
 			}
+			.image-container:active .overlay {
+				opacity: 1; /* 마우스를 올렸을 때 투명도를 1로 변경하여 보이도록 함 */
+			}
 		
 		/*
 		@media screen and (max-width: 980px) {
