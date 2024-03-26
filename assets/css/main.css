@@ -120,10 +120,10 @@ input, select, textarea {
 		background-image: url("images/overlay.png"), linear-gradient(45deg, #e37682 15%, #5f4d93 85%);
 		*/
 		background-color: #5CFFAA;
-		background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #d6b534 15%, #3CB371 85%);
-		background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #d6b534 15%, #3CB371 85%);
-		background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #d6b534 15%, #3CB371 85%);
-		background-image: url("images/overlay.png"), linear-gradient(45deg, #d6b534 15%, #3CB371 85%);
+		background-image: url("images/overlay.png"), -moz-linear-gradient(45deg, #005666 15%, #3CB371 85%);
+		background-image: url("images/overlay.png"), -webkit-linear-gradient(45deg, #005666 15%, #3CB371 85%);
+		background-image: url("images/overlay.png"), -ms-linear-gradient(45deg, #005666 15%, #3CB371 85%);
+		background-image: url("images/overlay.png"), linear-gradient(45deg, #005666 15%, #3CB371 85%);
 	}
 
 		body.is-preload *, body.is-preload *:before, body.is-preload *:after {
@@ -2693,7 +2693,7 @@ input, select, textarea {
 			}
 
 	footer.major {
-		margin-top: 3em;
+		margin-top: 1em;
 	}
 
 	@media screen and (max-width: 736px) {
@@ -3644,7 +3644,7 @@ input, select, textarea {
 		}
 
 		#main > .main {
-			padding: 5em 5em 3em 5em ;
+			padding: 3em 5em 3em 5em ;
 			border-top: solid 1px #dddddd;
 		}
 
@@ -3671,7 +3671,7 @@ input, select, textarea {
 		@media screen and (max-width: 1280px) {
 
 			#main > .main {
-				padding: 4em 4em 2em 4em ;
+				padding: 3em 4em 2em 4em ;
 			}
 
 				#main > .main > .image.main:first-child {
