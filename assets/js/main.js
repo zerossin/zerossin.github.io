@@ -80,6 +80,24 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+//see button 클릭시 부드러운 스크롤 구현
+document.addEventListener('DOMContentLoaded', function() {
+	var buttons = document.querySelectorAll('.seebutton');
+	buttons.forEach(function(button) {
+		button.addEventListener('click', function(event) {
+			event.preventDefault(); // 기본 동작 방지
+			var targetId = this.getAttribute('href').substring(1); // 링크의 대상 ID 가져오기
+			var targetElement = document.getElementById(targetId);
+			if (targetElement) {
+				// 대상 섹션으로 스무스 스크롤링
+				targetElement.scrollIntoView({ behavior: 'smooth' });
+			}
+		});
+	});
+});
+
+
+
 (function($) {
 
 	var	$window = $(window),
