@@ -7,10 +7,32 @@
 	font-weight: 400;
 	font-style: normal;
 }
-.black-han2{
-	font-family: "Black Han Sans", sans-serif;
-	font-weight: 200;
-	font-style: normal;
+
+@font-face {
+    font-family: 'KCC-Hanbit';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/KCC-Hanbit.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@keyframes gradientAnimation {
+	0% {
+		background-position: 0% 50%;
+	}
+	50% {
+		background-position: 100% 50%;
+	}
+	100% {
+		background-position: 0% 50%;
+	}
+}
+
+.gradientAnimation {
+	background: linear-gradient(to right, #ff00cc, #3333ff, #00ffcc);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-size: 300% 300%;
+	animation: gradientAnimation 3s linear infinite;
 }
   
 
@@ -145,7 +167,7 @@ input, select, textarea {
 	}
 
 	body, input, select, textarea {
-		font-family: "Source Sans Pro", Helvetica, sans-serif;
+		font-family: 'KCC-Hanbit', "Source Sans Pro", Helvetica, sans-serif;
 		font-size: 17pt;
 		font-weight: 300;
 		line-height: 1.65;
@@ -214,6 +236,7 @@ input, select, textarea {
 		}
 
 	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Black Han Sans', "Source Sans Pro", Helvetica, sans-serif;
 		font-weight: 300;
 		line-height: 1.5;
 		margin: 0 0 0.7em 0;
@@ -2852,6 +2875,7 @@ input, select, textarea {
 				width: 100%;
 				position: relative;
 				display: inline-block; /* 이미지와 overlay가 올바르게 정렬되도록 함 */
+				border-bottom: none;/*a에 설정된 밑줄 점선 없애기*/
 			}
 
 			.image-container::after {/*반응형 정사각형*/
@@ -2924,6 +2948,18 @@ input, select, textarea {
 					}
 
 		}*/
+
+		@media screen and (max-width: 980px) {
+			.features li {
+				padding: 3px;
+			}
+		}
+
+		@media screen and (max-width: 736px) {
+			.features li {
+				padding: 1px;
+			}
+		}
 
 /* Statistics */
 
@@ -3282,7 +3318,7 @@ input, select, textarea {
 		-ms-transition: background-color 0.2s ease, border-top-left-radius 0.2s ease, border-top-right-radius 0.2s ease, padding 0.2s ease;
 		transition: background-color 0.2s ease, border-top-left-radius 0.2s ease, border-top-right-radius 0.2s ease, padding 0.2s ease;
 		background-color: #ffffff;
-		color: #636363;
+		color: #1F806E;
 		position: absolute;
 		width: 64em;
 		max-width: calc(100% - 4em);
@@ -3418,7 +3454,7 @@ input, select, textarea {
 		}
 
 		#main h1, #main h2, #main h3, #main h4, #main h5, #main h6 {
-			color: #636363;
+			color: rgb(49, 49, 49);
 		}
 
 		#main blockquote {
