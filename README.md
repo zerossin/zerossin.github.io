@@ -2,4 +2,4 @@
 ## address: [gitpage.kevalsil.com](https://kevalsil.com/)
 
 If you can't connect, please connect to that address.
-(https://kevalsil.github.io/)
+(https://koremin.github.io/)
