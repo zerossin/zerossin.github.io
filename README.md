@@ -1,5 +1,6 @@
 # Personal homepage test 개인 홈페이지 테스트
-## address: [gitpage.kevalsil.com](https://kevalsil.com/)
+## address: [mintsclover.com](https://mintsclover.com/)
 
 If you can't connect, please connect to that address.
-(https://koremin.github.io/)
+(https://mintsclover.github.io/)
+(https://gitpage.mintsclover.com/)
