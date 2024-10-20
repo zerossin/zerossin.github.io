@@ -6,6 +6,44 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // 보이지 않는 li 요소의 시작 인덱스
+    var startIndex = 9;
+
+    // 모든 li 요소 가져오기
+    var listItems = document.querySelectorAll('#ul-projects li');
+
+    // 숨겨진 li 요소 숨기기
+    for (var i = startIndex; i < listItems.length; i++) {
+        listItems[i].style.display = 'none';
+    }
+	document.getElementById('button-seeless-projects').style.display = 'none';
+
+    // "See More" 버튼 클릭 시 추가적인 li 요소 보이기
+    document.getElementById('button-seemore-projects').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'list-item';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seeless-projects').style.display = 'block';
+    });
+
+	// "See Less" 버튼 클릭 시 추가적인 li 요소 숨기기
+    document.getElementById('button-seeless-projects').addEventListener('click', function() {
+        // 숨겨진 li 요소 보이기
+        for (var i = startIndex; i < listItems.length; i++) {
+            listItems[i].style.display = 'none';
+        }
+
+        // "See More" 버튼 숨기기
+        this.style.display = 'none';
+		document.getElementById('button-seemore-projects').style.display = 'block';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 보이지 않는 li 요소의 시작 인덱스
     var startIndex = 3;
 
     // 모든 li 요소 가져오기
