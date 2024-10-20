@@ -20,7 +20,7 @@ const projectItems = [
         title: "Source Code Scanner",
     },
     {
-        href: "https://gitpage.mintsclover.com/map/",
+        href: "https://map.mintsclover.com/",
         imgSrc: "assets/images/logo_mc_map.png",
         title: "Map",
     },
