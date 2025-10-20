@@ -34,6 +34,30 @@
 	background-size: 300% 300%;
 	animation: gradientAnimation 3s linear infinite;
 }
+
+/* 무한 슬라이드 컨테이너 */
+.scroll-container {
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+	padding: 20px 0;
+	min-height: 400px;
+}
+
+.scroll-content {
+	display: flex;
+	width: fit-content;
+	flex-wrap: nowrap !important;
+	gap: 0 !important;
+	will-change: transform;
+}
+
+.scroll-content li {
+	flex-shrink: 0;
+	margin: 0 20px;
+	list-style: none;
+	width: 250px;
+}
   
 
 /*
@@ -2467,11 +2491,14 @@ input, select, textarea {
 
 		ol li {
 			padding-left: 0.25em;
+			margin: 0;
+			padding: 0;
 		}
 
 	ul {
 		list-style: disc;
-		margin: 0 0 2em 0;
+			margin: 0 20px;
+			padding: 0;
 		padding-left: 1em;
 	}
 
