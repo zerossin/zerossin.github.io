@@ -56,17 +56,17 @@ const projectsByCategory = {
     ],
     game: [
         {
-            href: "https://battle.pulqum.com/",
+            href: "https://starspick.pulqum.com/",
             imgSrc: "assets/images/logo-prompt-arena.png",
-            title: "프롬프트 아레나",
+            title: "별들의 선택",
         },
         {
-            href: "https://gitpage.zerossin.com/js-rhythm-game/",
+            href: "https://gitpage.pulqum.com/js-rhythm-game/",
             imgSrc: "assets/images/logo-js-rhythm-game.png",
             title: "리듬게임",
         },
         {
-            href: "https://github.com/zerossin/python-korean-word-chain-game",
+            href: "https://github.com/pulqum/python-korean-word-chain-game",
             imgSrc: "assets/images/logo_word_chain_game.png",
             title: "Korean word chain game",
         },
