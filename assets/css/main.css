@@ -1,18 +1,42 @@
+/* ============================================
+   폰트 설정 (유지보수 용이하게 한곳에서 관리)
+   ============================================ */
 @import url(fontawesome-all.min.css);
 @import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400';
 @import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap');
 
-.black-han{
-	font-family: "Black Han Sans", sans-serif;
-	font-weight: 400;
-	font-style: normal;
+/* 영문 기본 폰트 */
+:root {
+	--font-en: 'Source Sans Pro', Helvetica, sans-serif;
+	--font-ko: 'Paperozi', var(--font-en);
+	--font-title: 'HakgyoansimAllimjang', var(--font-en);
+	--font-mono: 'Courier New', monospace;
+	--font-icon: 'Font Awesome 5 Free';
+	--font-icon-brands: 'Font Awesome 5 Brands';
+}
+
+/* 한글 기본 폰트 */
+
+@font-face {
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-5Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
 }
 
 @font-face {
-    font-family: 'KCC-Hanbit';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2403-2@1.0/KCC-Hanbit.woff2') format('woff2');
-    font-weight: normal;
-    font-style: normal;
+    font-family: 'Paperozi';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-6SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-display: swap;
+}
+
+/* 제목용 폰트 */
+@font-face {
+	font-family: 'HakgyoansimAllimjang';
+	src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-5@1.0/HakgyoansimAllimjangTTF-B.woff2') format('woff2');
+	font-weight: 700;
+	font-display: swap;
 }
 
 @keyframes gradientAnimation {
@@ -41,7 +65,7 @@
 	width: 100%;
 	position: relative;
 	padding: 20px 0;
-	min-height: 400px;
+	min-height: auto;
 }
 
 .scroll-content {
@@ -55,8 +79,27 @@
 .scroll-content li {
 	flex-shrink: 0;
 	margin: 0 20px;
+	padding: 0;
 	list-style: none;
 	width: 250px;
+}
+
+.scroll-content li a {
+	display: block;
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+	transition: all 0.3s ease;
+}
+
+.scroll-content li a:hover {
+	border-color: rgba(255, 255, 255, 0.4);
+	backdrop-filter: blur(15px);
+	-webkit-backdrop-filter: blur(15px);
+	box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
   
 
@@ -191,7 +234,7 @@ input, select, textarea {
 	}
 
 	body, input, select, textarea {
-		font-family: 'KCC-Hanbit', "Source Sans Pro", Helvetica, sans-serif;
+		font-family: var(--font-ko);
 		font-size: 17pt;
 		font-weight: 300;
 		line-height: 1.65;
@@ -260,7 +303,7 @@ input, select, textarea {
 		}
 
 	h1, h2, h3, h4, h5, h6 {
-		font-family: 'Black Han Sans', "Source Sans Pro", Helvetica, sans-serif;
+		font-family: var(--font-title);
 		font-weight: 300;
 		line-height: 1.5;
 		margin: 0 0 0.7em 0;
@@ -1889,6 +1932,9 @@ input, select, textarea {
 
 	.box {
 		border-color: rgba(255, 255, 255, 0.35);
+		background: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
 	}
 
 /* Button */
@@ -1990,9 +2036,22 @@ input, select, textarea {
 	input[type="button"],
 	button,
 	.button {
-		background-color: transparent;
+		background-color: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
 		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
 		color: #ffffff !important;
+		border-radius: 6px;
+		transition: all 0.3s ease;
+	}
+
+	input[type="submit"]:hover,
+	input[type="reset"]:hover,
+	input[type="button"]:hover,
+	button:hover,
+	.button:hover {
+		background-color: rgba(255, 255, 255, 0.1);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 4px 16px rgba(0, 0, 0, 0.2);
 	}
 
 		input[type="submit"]:hover,
@@ -2215,8 +2274,12 @@ input, select, textarea {
 	input[type="email"],
 	select,
 	textarea {
-		background-color: rgba(255, 255, 255, 0.075);
-		border-color: rgba(255, 255, 255, 0.35);
+		background-color: rgba(255, 255, 255, 0.05);
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+		border-color: rgba(255, 255, 255, 0.2);
+		border-radius: 4px;
+		transition: all 0.3s ease;
 	}
 
 		input[type="text"]:focus,
@@ -2224,9 +2287,13 @@ input, select, textarea {
 		input[type="email"]:focus,
 		select:focus,
 		textarea:focus {
+			background-color: rgba(255, 255, 255, 0.1);
 			border-color: #8cc9f0;
-			box-shadow: 0 0 0 1px #8cc9f0;
+			box-shadow: 0 0 0 1px #8cc9f0, 0 0 12px rgba(140, 201, 240, 0.3);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
 		}
+
 
 	select {
 		background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' preserveAspectRatio='none' viewBox='0 0 40 40'%3E%3Cpath d='M9.4,12.3l10.4,10.4l10.4-10.4c0.2-0.2,0.5-0.4,0.9-0.4c0.3,0,0.6,0.1,0.9,0.4l3.3,3.3c0.2,0.2,0.4,0.5,0.4,0.9 c0,0.4-0.1,0.6-0.4,0.9L20.7,31.9c-0.2,0.2-0.5,0.4-0.9,0.4c-0.3,0-0.6-0.1-0.9-0.4L4.3,17.3c-0.2-0.2-0.4-0.5-0.4-0.9 c0-0.4,0.1-0.6,0.4-0.9l3.3-3.3c0.2-0.2,0.5-0.4,0.9-0.4S9.1,12.1,9.4,12.3z' fill='rgba(255, 255, 255, 0.35)' /%3E%3C/svg%3E");
@@ -2705,6 +2772,7 @@ input, select, textarea {
 	section.special, article.special {
 		text-align: center;
 	}
+
 
 	header.major {
 		margin-bottom: 3em;
