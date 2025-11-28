@@ -59,47 +59,157 @@
 	animation: gradientAnimation 3s linear infinite;
 }
 
-/* 무한 슬라이드 컨테이너 */
-.scroll-container {
-	overflow: hidden;
-	width: 100%;
+/* Carousel Container */
+.carousel-container {
 	position: relative;
-	padding: 20px 0;
-	min-height: auto;
-}
-
-.scroll-content {
-	display: flex;
-	width: fit-content;
-	flex-wrap: nowrap !important;
-	gap: 0 !important;
-	will-change: transform;
-}
-
-.scroll-content li {
-	flex-shrink: 0;
-	margin: 0 20px;
+	width: 100%;
+	max-width: 100%;
 	padding: 0;
-	list-style: none;
-	width: 250px;
+	box-sizing: border-box;
 }
 
-.scroll-content li a {
+/* Scroll Window */
+.scroll-window {
+	overflow-x: auto;
+	scroll-behavior: smooth;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+	scroll-snap-type: x mandatory;
+	padding: 40px 0;
+	scroll-padding-left: 60px; /* Align snaps with visible area */
+	scroll-padding-right: 60px;
+	
+	/* Reset to block to ensure simple scrolling behavior */
 	display: block;
-	border-radius: 12px;
+	text-align: left;
+}
+
+.scroll-window::-webkit-scrollbar { 
+	display: none;
+}
+
+/* Carousel Content List */
+.carousel-content {
+	display: flex;
+	
+	/* THE REAL SAFE CENTER FIX: */
+	/* 1. Allow width to grow as needed for large lists */
+	width: max-content; 
+	/* 2. But force it to be at least the screen width for small lists */
+	min-width: 100%;
+	/* 3. Center items within this box. 
+	   - If content > screen, box is huge, items are packed at start (Left Aligned).
+	   - If content < screen, box is screen size, items are centered (Center Aligned).
+	*/
+	justify-content: center;
+	
+	flex-wrap: nowrap !important;
+	gap: 24px;
+	margin: 0 !important;
+	padding: 0 60px !important; /* Padding for buttons */
+	box-sizing: border-box;
+}
+
+.carousel-content li {
+	flex: 0 0 auto;
+	width: 300px;
+	scroll-snap-align: start; /* Start snap keeps first items visible */
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	user-select: none;
+}
+
+.carousel-content li a {
+	display: block;
+	border-radius: 16px;
 	overflow: hidden;
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
-	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
-	transition: all 0.3s ease;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+	transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+	transform: scale(1);
 }
 
-.scroll-content li a:hover {
-	border-color: rgba(255, 255, 255, 0.4);
-	backdrop-filter: blur(15px);
-	-webkit-backdrop-filter: blur(15px);
-	box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+.carousel-content li a:hover {
+	border-color: rgba(255, 255, 255, 0.5);
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+	transform: translateY(-10px);
+}
+
+/* Navigation Buttons */
+.nav-button {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	appearance: none;
+	-webkit-appearance: none;
+	min-width: 0 !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	line-height: normal !important;
+	background: transparent !important;
+	border: 1px solid rgba(255, 255, 255, 0.9) !important;
+	box-shadow: none !important;
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 2rem;
+	width: 60px !important;
+	height: 60px !important;
+	border-radius: 50%;
+	cursor: pointer;
+	z-index: 10;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.3s ease;
+	opacity: 0;
+	pointer-events: none;
+}
+
+
+.nav-button:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+.nav-button:hover {
+	color: #ffffff;
+	background-color: rgba(255, 255, 255, 0.1) !important;
+	border-color: rgba(255, 255, 255, 0.6) !important;
+	transform: translateY(-50%) scale(1.1);
+}
+
+.nav-button.left {
+	left: 0;
+}
+
+.nav-button.right {
+	right: 0;
+}
+
+@media screen and (max-width: 736px) {
+	.nav-button {
+		display: none;
+	}
+	.scroll-window {
+		padding: 30px 0;
+		scroll-padding-left: calc(50% - 35vw);
+		scroll-padding-right: calc(50% - 35vw);
+	}
+	.carousel-content {
+		gap: 16px;
+		/* Mobile Centering Logic:
+		   Padding ensures the first item (70vw) is centered in the 100vw container.
+		   (100 - 70) / 2 = 15vw padding on each side.
+		*/
+		padding: 0 calc(50% - 35vw) !important;
+	}
+	.carousel-content li {
+		width: 70vw; 
+		scroll-snap-align: center;
+	}
 }
   
 
@@ -3055,6 +3165,41 @@ input, select, textarea {
 				padding: 1px;
 			}
 		}
+
+		/* Carousel overrides (must come after .features defaults) */
+
+			.features.carousel-content {
+				display: flex;
+				flex-wrap: nowrap !important;
+				justify-content: flex-start !important;
+				width: max-content;
+				min-width: 100%;
+				gap: 24px;
+				margin: 0 !important;
+				padding: 0 60px !important;
+				box-sizing: border-box;
+			}
+
+			.features.carousel-content li {
+				flex: 0 0 auto;
+				width: 300px;
+				padding: 0;
+				margin: 0;
+			}
+
+			.features.carousel-content li a {
+				border-radius: 16px;
+			}
+
+			@media screen and (max-width: 736px) {
+				.features.carousel-content {
+					gap: 16px;
+					padding: 0 calc(50% - 35vw) !important;
+				}
+				.features.carousel-content li {
+					width: 70vw;
+				}
+			}
 
 /* Statistics */
 
