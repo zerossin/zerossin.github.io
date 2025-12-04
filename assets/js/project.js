@@ -24,13 +24,18 @@ const projectsByCategory = {
             title: "DISA Project",
         },
         {
+            href: "https://github.com/pulqum/desklog",
+            imgSrc: "assets/images/logo-desklog.png",
+            title: "Desk Log",
+        },
+        {
             href: "https://github.com/pulqum/database-project",
             imgSrc: "assets/images/database-project.jpeg",
             title: "database project",
         },
         {
             href: "https://test.pulqum.com/",
-            imgSrc: "assets/images/imsi.png",
+            imgSrc: "assets/images/logo-image-converter.png",
             title: "image converter",
         },
         {
@@ -40,7 +45,7 @@ const projectsByCategory = {
         },
         {
             href: "https://gitpage.pulqum.com/source-code-scanner/",
-            imgSrc: "assets/images/logo_source_code_scanner.jpeg",
+            imgSrc: "assets/images/logo-source-code-scanner.png",
             title: "Source Code Scanner",
         },
         {
@@ -55,6 +60,11 @@ const projectsByCategory = {
         },
     ],
     game: [
+        {
+            href: "https://dice.pulqum.com/",
+            imgSrc: "assets/images/logo-dice-battle.png",
+            title: "다이스 필드",
+        },
         {
             href: "https://starspick.pulqum.com/",
             imgSrc: "assets/images/logo-prompt-arena.png",
