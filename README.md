@@ -1,6 +1,6 @@
 # Personal homepage test 개인 홈페이지 테스트
-## address: [cherossin.com](https://cherossin.com/)
+## address: [zerossin.com](https://zerossin.com/)
 
 If you can't connect, please connect to that address.
-(https://cherossin.github.io/)
-(https://gitpage.cherossin.com/)
+(https://zerossin.github.io/)
+(https://gitpage.zerossin.com/)
