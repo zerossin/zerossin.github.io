@@ -612,6 +612,13 @@ function moveDraggedTo(targetRef, pointerX, pointerY) {
 	lastMoveAt = performance.now();
 }
 
+// 두 사각형이 겹치는 면적
+function overlapArea(a, b) {
+	const w = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+	const h = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+	return w * h;
+}
+
 function onDragMove(e) {
 	if (!dragNode) return;
 	e.preventDefault(); // 드래그 중엔 페이지가 같이 스크롤되지 않게
@@ -622,21 +629,31 @@ function onDragMove(e) {
 
 	if (performance.now() - lastMoveAt < MOVE_DEBOUNCE_MS) return; // 경계에서 계속 왔다갔다 하는 것 방지
 
+	// "포인터에서 가장 가까운 것"이 아니라, 지금 손가락을 따라가는 중인 이
+	// 아이콘 자신의 사각형이 다른 아이콘 위에 실제로 상당 부분 겹쳐야만
+	// 반응한다. 예전엔 이 문턱값(임계 겹침 비율)이 있었는데 리플로우 방식으로
+	// 바꾸면서 실수로 빠져서 아주 살짝만 움직여도 "가장 가까운 후보"가 계속
+	// 바뀌어 매번 반응해버렸음 — 그게 자잘하게 계속 재배치되던 원인.
+	const dragRect = dragNode.getBoundingClientRect(); // 지금 실제로 보이는(포인터를 따라간) 위치
+	const dragArea = dragRect.width * dragRect.height;
 	const others = getReorderableNodes().filter((n) => n !== dragNode);
-	let closest = null;
-	let closestDist = Infinity;
+
+	let best = null;
+	let bestRatio = 0;
 	others.forEach((n) => {
 		const r = n.getBoundingClientRect();
-		const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
-		if (dist < closestDist) {
-			closestDist = dist;
-			closest = n;
+		// 겹친 면적을 "둘 중 더 작은 쪽" 기준으로 비율을 재야, 위젯처럼 서로
+		// 크기가 많이 다른 상대와 비교해도 공평하게 판정된다.
+		const ratio = overlapArea(dragRect, r) / Math.min(dragArea, r.width * r.height);
+		if (ratio > bestRatio) {
+			bestRatio = ratio;
+			best = n;
 		}
 	});
-	if (!closest) return;
+	if (!best || bestRatio < 0.5) return; // 절반 이상 확실히 겹쳐야 반응 — 스치는 정도는 무시
 
-	const closestRect = closest.getBoundingClientRect();
-	const targetRef = isBeforeInReadingOrder(e.clientX, e.clientY, closestRect) ? closest : closest.nextSibling;
+	const bestRect = best.getBoundingClientRect();
+	const targetRef = isBeforeInReadingOrder(e.clientX, e.clientY, bestRect) ? best : best.nextSibling;
 	if (targetRef === dragNode || dragNode.nextSibling === targetRef) return; // 이미 그 자리면 아무것도 안 함
 	moveDraggedTo(targetRef, e.clientX, e.clientY);
 }
