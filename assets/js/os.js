@@ -234,6 +234,7 @@ function buildIconFace(app) {
 		img.src = app.img;
 		img.alt = "";
 		img.loading = "lazy";
+		img.draggable = false; // <img>는 기본이 draggable="true"라 커스텀 재배치 드래그와 충돌함
 		if (app.iconObjectPosition) img.style.objectPosition = app.iconObjectPosition;
 		face.appendChild(img);
 	} else if (app.icon) {
@@ -251,7 +252,7 @@ function buildFolderFace(folderKey) {
 		if (!item) {
 			minis.appendChild(el("div", "mini empty"));
 		} else if (item.img) {
-			minis.appendChild(el("div", "mini", `<img src="${item.img}" alt="" loading="lazy" />`));
+			minis.appendChild(el("div", "mini", `<img src="${item.img}" alt="" loading="lazy" draggable="false" />`));
 		} else {
 			const m = el("div", "mini letter", item.letter);
 			m.style.background = item.color || "#8a93a2";
@@ -266,9 +267,11 @@ function renderApp(app) {
 	const isLink = app.type === "link";
 	const node = el(isLink ? "a" : "button", "app");
 	node.setAttribute("aria-label", app.label);
+	node.dataset.appId = app.id;
 
 	if (isLink) {
 		node.href = app.href || "#";
+		node.draggable = false; // <a>도 기본이 draggable="true"라 커스텀 재배치 드래그와 충돌함
 		if (app.href && app.href !== "#") {
 			node.target = "_blank";
 			node.rel = "noreferrer";
@@ -442,6 +445,7 @@ function openWindow(title, body, originEl, subtitle) {
 /* ---------------- 시계 ---------------- */
 
 function tickClock() {
+	if (jiggling) return; // 흔들기 모드에서는 "완료" 버튼 자리라 시계를 안 덮어씀
 	const clock = document.getElementById("os-clock");
 	if (!clock) return;
 	const now = new Date();
@@ -450,11 +454,257 @@ function tickClock() {
 	clock.textContent = `${hh}:${mm}`;
 }
 
+/* ---------------- 아이콘 재배치 순서 저장 ----------------
+   서버가 없으니 "재배치"는 어차피 방문자 각자의 브라우저 안에서만 의미가
+   있다 — 이 사이트의 실제 기본 순서(다른 방문자가 보는 것)는 절대 안
+   바뀌고, 이 브라우저에서 새로고침해도 유지되는 정도의 로컬 저장. */
+
+const ORDER_KEY = "zerossin-app-order";
+
+function loadOrder(defaultIds) {
+	let saved = [];
+	try {
+		saved = JSON.parse(localStorage.getItem(ORDER_KEY) || "[]");
+	} catch (e) {
+		saved = [];
+	}
+	const known = saved.filter((id) => defaultIds.includes(id));
+	const rest = defaultIds.filter((id) => !known.includes(id)); // 저장 이후 새로 추가된 앱은 뒤에 붙음
+	return [...known, ...rest];
+}
+
+function saveOrder(ids) {
+	try {
+		localStorage.setItem(ORDER_KEY, JSON.stringify(ids));
+	} catch (e) {
+		// 시크릿 모드 등으로 localStorage가 막혀 있어도 조용히 무시 — 이번 방문 동안만 재배치됨
+	}
+}
+
+/* ---------------- 아이콘 흔들기(jiggle) & 드래그 재배치 ----------------
+   길게 누르면 흔들리기 시작(iOS jiggle mode), 그 상태에서 끌면 가장
+   가까운 다른 아이콘과 자리를 바꾼다. 위젯(About/Skill)은 칸 크기가
+   달라 재배치 대상에서 제외 — 일반 앱/폴더만 순서를 바꿀 수 있다. */
+
+let jiggling = false;
+let dragNode = null;
+let dragBaseRect = null; // dragNode의 "자연"(transform 없는) 위치 — 스왑마다 다시 잼
+let dragBasePointer = null; // 위 기준을 잰 시점의 포인터 좌표
+let pressState = null;
+let lastSwapAt = 0;
+
+const LONG_PRESS_MS = 450;
+const MOVE_CANCEL_PX = 10;
+const SWAP_DEBOUNCE_MS = 180; // 두 아이콘 사이 경계에서 계속 왔다갔다 스왑되는 것 방지
+
+function getReorderableNodes() {
+	return [...home.querySelectorAll(":scope > .app:not(.widget-slot)")];
+}
+
+function enterJiggleMode() {
+	if (jiggling) return;
+	jiggling = true;
+	home.classList.add("jiggle");
+	const clock = document.getElementById("os-clock");
+	if (clock) {
+		clock.textContent = "완료";
+		clock.classList.add("os-done-btn");
+		clock.addEventListener("click", exitJiggleMode);
+	}
+}
+
+function exitJiggleMode() {
+	if (!jiggling) return;
+	jiggling = false;
+	home.classList.remove("jiggle");
+	const clock = document.getElementById("os-clock");
+	if (clock) {
+		clock.classList.remove("os-done-btn");
+		clock.removeEventListener("click", exitJiggleMode);
+	}
+	tickClock();
+	saveOrder(getReorderableNodes().map((n) => n.dataset.appId));
+}
+
+function swapNodes(a, b) {
+	const aNext = a.nextSibling;
+	const bNext = b.nextSibling;
+	if (aNext === b) {
+		home.insertBefore(b, a);
+	} else if (bNext === a) {
+		home.insertBefore(a, b);
+	} else {
+		home.insertBefore(a, bNext);
+		home.insertBefore(b, aNext);
+	}
+}
+
+function beginDrag(node, pointerId, clientX, clientY) {
+	dragNode = node;
+	node.classList.add("dragging");
+	node.style.transition = "none"; // 드래그 중엔 손가락과 100% 같이 움직여야 하니 애니메이션 없이
+	dragBaseRect = node.getBoundingClientRect();
+	dragBasePointer = { x: clientX, y: clientY };
+	try {
+		node.setPointerCapture(pointerId);
+	} catch (e) {
+		// setPointerCapture가 안 되는 환경이어도(구형 브라우저 등) 드래그 자체는 계속 동작
+	}
+}
+
+// 드래그로 밀려나는 아이콘 vs 손가락을 따라가는 아이콘, 둘 다 "순간이동"처럼
+// 안 보이게 하는 FLIP 기법: 옮기기 전 위치를 재고(First) → DOM을 실제로
+// 옮긴 뒤(Last) → 그 차이만큼 역방향 transform을 즉시 걸어 시각적으로는 그대로
+// 있는 것처럼 만들고(Invert) → 다음 프레임에 transform을 0으로 애니메이션
+// 시키면(Play) 실제로는 순간이동했지만 눈에는 미끄러지듯 이동한 것처럼 보인다.
+function performSwap(other, pointerX, pointerY) {
+	const dragVisualBefore = dragNode.getBoundingClientRect();
+	const otherRectBefore = other.getBoundingClientRect();
+
+	swapNodes(dragNode, other);
+
+	// 드래그 중인 아이콘: 새 grid 자리로 옮겨졌지만, 지금 보이던 자리 그대로
+	// 이어서 손가락을 따라가도록 기준점을 다시 잡는다(안 그러면 순간 점프해 보임).
+	dragNode.style.transform = "none";
+	const dragNaturalAfter = dragNode.getBoundingClientRect();
+	const neededDX = dragVisualBefore.left - dragNaturalAfter.left;
+	const neededDY = dragVisualBefore.top - dragNaturalAfter.top;
+	dragNode.style.transform = `translate(${neededDX}px, ${neededDY}px)`;
+	dragBaseRect = dragNaturalAfter;
+	dragBasePointer = { x: pointerX - neededDX, y: pointerY - neededDY };
+
+	// 밀려난 아이콘: 원래 있던 자리 → 새 자리로 부드럽게 슬라이드
+	const otherRectAfter = other.getBoundingClientRect();
+	const odx = otherRectBefore.left - otherRectAfter.left;
+	const ody = otherRectBefore.top - otherRectAfter.top;
+	other.style.transition = "none";
+	other.style.transform = `translate(${odx}px, ${ody}px)`;
+	requestAnimationFrame(() => {
+		other.style.transition = "transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1)";
+		other.style.transform = "";
+		other.addEventListener("transitionend", () => { other.style.transition = ""; }, { once: true });
+	});
+
+	lastSwapAt = performance.now();
+}
+
+function onDragMove(e) {
+	if (!dragNode) return;
+	e.preventDefault(); // 드래그 중엔 페이지가 같이 스크롤되지 않게
+
+	const dx = e.clientX - dragBasePointer.x;
+	const dy = e.clientY - dragBasePointer.y;
+	dragNode.style.transform = `translate(${dx}px, ${dy}px)`;
+
+	if (performance.now() - lastSwapAt < SWAP_DEBOUNCE_MS) return; // 경계에서 계속 스왑되는 것 방지
+
+	const others = getReorderableNodes().filter((n) => n !== dragNode);
+	let closest = null;
+	let closestDist = Infinity;
+	others.forEach((n) => {
+		const r = n.getBoundingClientRect();
+		const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+		if (dist < closestDist) {
+			closestDist = dist;
+			closest = n;
+		}
+	});
+	if (closest && closestDist < dragBaseRect.width * 0.6) {
+		performSwap(closest, e.clientX, e.clientY);
+	}
+}
+
+function endDrag() {
+	if (!dragNode) return;
+	const node = dragNode;
+	node.classList.remove("dragging");
+	node.removeEventListener("pointermove", onDragMove);
+
+	// 놓는 순간: 떠 있던 자리에서 제 grid 자리로 부드럽게 안착
+	node.style.transition = "transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1)";
+	node.style.transform = "";
+	node.addEventListener("transitionend", () => { node.style.transition = ""; }, { once: true });
+
+	dragNode = null;
+	dragBaseRect = null;
+	dragBasePointer = null;
+	saveOrder(getReorderableNodes().map((n) => n.dataset.appId));
+}
+
+function initReorder() {
+	// <img>/<a>는 브라우저 기본 드래그(이미지 끌어서 빼기, 링크 끌어서 북마크하기 등)를
+	// 갖고 있어서, 그게 먼저 끼어들면 우리 pointermove가 안 들어와 재배치가 먹통이
+	// 된다. draggable="false"를 개별적으로 걸어뒀지만, 혹시 놓친 요소가 있어도
+	// 안전하도록 홈 화면 전체에서 네이티브 드래그 자체를 막아버린다.
+	home.addEventListener("dragstart", (e) => e.preventDefault());
+
+	getReorderableNodes().forEach((node) => {
+		node.addEventListener("pointerdown", (e) => {
+			if (e.button > 0) return; // 마우스 우클릭 등은 무시
+
+			if (jiggling) {
+				// 이미 흔들기 모드면 롱프레스 없이 바로 그 아이콘을 집어서 옮긴다
+				beginDrag(node, e.pointerId, e.clientX, e.clientY);
+				node.addEventListener("pointermove", onDragMove, { passive: false });
+				node.addEventListener("pointerup", endDrag, { once: true });
+				node.addEventListener("pointercancel", endDrag, { once: true });
+				return;
+			}
+
+			const startX = e.clientX;
+			const startY = e.clientY;
+			const timer = setTimeout(() => {
+				pressState = null;
+				enterJiggleMode();
+				beginDrag(node, e.pointerId, e.clientX, e.clientY);
+				node.addEventListener("pointermove", onDragMove, { passive: false });
+				node.addEventListener("pointerup", endDrag, { once: true });
+				node.addEventListener("pointercancel", endDrag, { once: true });
+			}, LONG_PRESS_MS);
+			pressState = { timer };
+
+			const cancelIfMoved = (ev) => {
+				if (Math.hypot(ev.clientX - startX, ev.clientY - startY) > MOVE_CANCEL_PX) {
+					clearTimeout(timer);
+					pressState = null;
+					node.removeEventListener("pointermove", cancelIfMoved);
+				}
+			};
+			const clearPress = () => {
+				clearTimeout(timer);
+				pressState = null;
+				node.removeEventListener("pointermove", cancelIfMoved);
+			};
+			node.addEventListener("pointermove", cancelIfMoved);
+			node.addEventListener("pointerup", clearPress, { once: true });
+			node.addEventListener("pointercancel", clearPress, { once: true });
+		});
+	});
+
+	// 흔들기 모드에서 앱/폴더가 열리지 않게 클릭을 가로채고, 빈 공간을 누르면 종료
+	home.addEventListener(
+		"click",
+		(e) => {
+			if (!jiggling) return;
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			if (e.target === home) exitJiggleMode();
+		},
+		true
+	);
+}
+
 /* ---------------- 초기화 ---------------- */
 
 home.appendChild(wrapAsWidgetApp("About", renderAboutWidget()));
 home.appendChild(wrapAsWidgetApp("Skill", renderSkillWidget()));
-APPS.forEach((app) => home.appendChild(renderApp(app)));
+
+const orderedIds = loadOrder(APPS.map((a) => a.id));
+orderedIds.forEach((id) => {
+	const app = APPS.find((a) => a.id === id);
+	if (app) home.appendChild(renderApp(app));
+});
+initReorder();
 
 tickClock();
 setInterval(tickClock, 15000);
