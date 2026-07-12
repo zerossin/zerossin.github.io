@@ -34,7 +34,7 @@ const FOLDERS = {
 		desc: "학술 연구 및 논문 프로젝트",
 		items: [
 			{ href: "https://github.com/zerossin/MonoDETR-Weather3D", img: "assets/images/logo_MonoDETR-Weather3D.png", title: "MonoDETR-Weather3D" },
-			{ href: "https://github.com/zerossin/MonoDETR-Weather3D", img: "assets/images/logo_gen-clear-drive.jpg", title: "gen-clear-drive" },
+			{ href: "https://github.com/zerossin/gen-clear-drive", img: "assets/images/logo_gen-clear-drive.png", title: "gen-clear-drive" },
 			{ href: "https://github.com/zerossin/room-classifier", img: "assets/images/logo_indoor.png", title: "YOLOv5 room classifier" },
 		],
 	},
@@ -108,6 +108,21 @@ const GALLERY = [
 	"assets/images/pic06.jpg",
 ];
 
+/* ---------------- 마인크래프트 건축 사진 ---------------- */
+
+const MINECRAFT_GALLERY = [
+	"남해동 전경.png",
+	"돈화문.png",
+	"레켄스 남해.png",
+	"본관.png",
+	"북해동시작동(압축).png",
+	"수민국 전경.png",
+	"수민대학교.png",
+	"시작동북해동(압축).png",
+	"정부청사단지.png",
+	"청와당.png",
+].map((name) => encodeURI("assets/images/minecraft/" + name));
+
 /* ---------------- 아이콘 (인라인 SVG) ---------------- */
 
 const ICONS = {
@@ -145,6 +160,12 @@ const APPS = [
 	{ id: "gallery", label: "Gallery", type: "window", icon: ICONS.gallery, bg: "#ffffff" },
 	{ id: "canvas", label: "Canvas", type: "window", icon: ICONS.canvas, bg: "#fdf6ec" },
 	{ id: "history", label: "History", type: "window", icon: ICONS.history, bg: "#eef1f5" },
+	// 완전히 쓸데없지만 그게 재미 포인트인 앱. 아이콘은 gif 첫 프레임에서 멈춰있다가
+	// 열면 그 고양이들이 우르르 몰려나와 제멋대로 춤춘다.
+	// 아이콘은 미리 뽑아둔 정지 프레임(진짜 PNG 파일)을 쓴다 — 처음엔 <canvas>로
+	// gif 첫 프레임을 캡처해서 바꿔치기했는데, file://로 그냥 열면 캔버스가
+	// "오염(tainted)" 처리되어 toDataURL이 조용히 실패해 계속 움직여 보였음.
+	{ id: "cat", label: "Cat", type: "window", img: "assets/images/cat-oiiaoiia-cat-icon.png", desc: "쓸데없는 춤", iconObjectPosition: "38% 50%" },
 ];
 
 /* ===================================================================
@@ -209,7 +230,12 @@ function buildIconFace(app) {
 	const face = el("div", "app-icon");
 	if (app.bg) face.style.background = app.bg;
 	if (app.img) {
-		face.innerHTML = `<img src="${app.img}" alt="" loading="lazy" />`;
+		const img = document.createElement("img");
+		img.src = app.img;
+		img.alt = "";
+		img.loading = "lazy";
+		if (app.iconObjectPosition) img.style.objectPosition = app.iconObjectPosition;
+		face.appendChild(img);
 	} else if (app.icon) {
 		face.innerHTML = app.icon;
 	}
@@ -256,7 +282,7 @@ function renderApp(app) {
 	if (app.type === "folder") {
 		node.addEventListener("click", () => openWindow(FOLDERS[app.folder].label, folderBody(app.folder), face, FOLDERS[app.folder].desc));
 	} else if (app.type === "window") {
-		node.addEventListener("click", () => openWindow(app.label, windowBody(app.id), face));
+		node.addEventListener("click", () => openWindow(app.label, windowBody(app.id), face, app.desc));
 	}
 	return node;
 }
@@ -300,7 +326,52 @@ function windowBody(id) {
 		return ul;
 	}
 	if (id === "minecraft") {
-		return el("div", "win-placeholder", `<div class="big">🧱</div>마인크래프트 건축 사진을 준비 중입니다.<br>완성되는 대로 하나씩 채울 예정이에요.`);
+		const g = el("div", "win-gallery");
+		const shuffled = [...MINECRAFT_GALLERY].sort(() => Math.random() - 0.5);
+		shuffled.forEach((src) => {
+			g.innerHTML += `<img src="${src}" alt="" loading="lazy" />`;
+		});
+		return g;
+	}
+	if (id === "cat") {
+		// 화면보호기처럼: 원본 gif 색 그대로, 랜덤한 지점으로 슬금슬금 이동만
+		// 시키고 커졌다 작아졌다만 반복시킨다. 춤 자체는 gif가 이미 추고 있으니
+		// 회전/색조 같은 추가 효과는 안 넣는다(그게 더 무서웠음).
+		const stage = el("div", "win-catstage");
+		stage.appendChild(el("div", "win-catstage-lights"));
+		const CAT_COUNT = 10;
+		for (let i = 0; i < CAT_COUNT; i++) {
+			const cat = document.createElement("img");
+			cat.alt = "";
+			cat.className = "cat-dancer";
+			cat.style.width = (44 + Math.random() * 44).toFixed(0) + "px";
+			// 같은 gif를 그대로 재사용하면 브라우저가 프레임을 동기화해버려 다 같이
+			// 춤춘다. 쿼리스트링으로 매번 다른 리소스처럼 취급하게 만들고, src를
+			// 주는 시점 자체도 무작위로 늦춰서 gif가 서로 다른 순간에 0프레임부터
+			// 재생을 시작하게 한다 — 그래야 진짜로 제각각 춤춘다.
+			const startDelay = Math.random() * 900;
+			setTimeout(() => {
+				cat.src = `assets/images/cat-oiiaoiia-cat.gif?c=${i}`;
+			}, startDelay);
+			cat.style.animationDuration = (1.6 + Math.random() * 1.4).toFixed(2) + "s";
+			cat.style.animationDelay = (-Math.random() * 2).toFixed(2) + "s";
+
+			const moveMs = 1800 + Math.random() * 1800;
+			cat.style.transitionDuration = (moveMs / 1000).toFixed(2) + "s";
+
+			const wander = () => {
+				if (!stage.isConnected) return; // 창이 닫혔으면(혹은 아직 안 열렸으면) 스스로 멈춘다
+				cat.style.left = (8 + Math.random() * 84).toFixed(1) + "%";
+				cat.style.top = (10 + Math.random() * 78).toFixed(1) + "%";
+				setTimeout(wander, moveMs);
+			};
+			// setTimeout으로 한 틱 미뤄서, openWindow()가 이 stage를 실제 DOM에
+			// 붙인 뒤에 첫 위치 지정이 실행되도록 한다(그래야 isConnected가 true).
+			setTimeout(wander, 20 + i * 25);
+
+			stage.appendChild(cat);
+		}
+		return stage;
 	}
 	// canvas
 	return el("div", "win-placeholder", `<div class="big">🎨</div>그림 작품을 준비 중입니다.<br>곧 채워질 예정이에요.`);

@@ -551,6 +551,76 @@ button {
 	margin-bottom: 10px;
 }
 
+/* Cat window — a deliberately pointless app: a screen-saver-style room
+   where the (already-animated) cat gif just wanders to a random spot and
+   pulses bigger/smaller. No added color/rotation — the gif is doing
+   plenty on its own, and tinting it turned out to look unsettling. */
+
+.win-catstage {
+	position: relative;
+	min-height: min(52vh, 420px);
+	border-radius: 16px;
+	overflow: hidden;
+	background: #ffffff;
+	border: 1px solid rgba(29, 29, 31, 0.08);
+}
+
+/* party lighting behind the cats — a slowly spinning, blurred conic
+   rainbow plus a couple of pulsing spotlight blobs. Lives on its own layer
+   BEHIND the cats (added to the DOM first, so default stacking order puts
+   it underneath) so it never tints the cats themselves. */
+
+.win-catstage-lights {
+	position: absolute;
+	inset: -30%;
+	background:
+		radial-gradient(circle at 22% 28%, rgba(255, 40, 120, 0.75), transparent 38%),
+		radial-gradient(circle at 78% 30%, rgba(255, 210, 30, 0.7), transparent 38%),
+		radial-gradient(circle at 30% 78%, rgba(40, 220, 255, 0.7), transparent 38%),
+		radial-gradient(circle at 78% 72%, rgba(150, 60, 255, 0.7), transparent 38%),
+		conic-gradient(from 0deg, #ff2e63, #ffd23f, #35e08a, #2ec4ff, #b24cff, #ff2e63);
+	filter: blur(34px) saturate(2.1);
+	opacity: 0.7;
+	animation: party-spin 6s linear infinite, party-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes party-spin {
+	to { transform: rotate(360deg); }
+}
+
+@keyframes party-pulse {
+	0%, 100% { opacity: 0.55; }
+	50% { opacity: 0.85; }
+}
+
+.cat-dancer {
+	position: absolute;
+	width: 64px;
+	pointer-events: none;
+	/* sit above .win-catstage-lights regardless of paint order */
+	z-index: 1;
+	/* JS sets left/top to a new random point every so often, and a matching
+	   transition-duration, so it glides there screen-saver style */
+	transition-property: left, top;
+	transition-timing-function: ease-in-out;
+	transform: translate(-50%, -50%);
+	animation-name: cat-pulse;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: infinite;
+}
+
+/* the individual `scale` property (not the transform shorthand) so it
+   composes with the static transform:translate(-50%,-50%) centering above */
+@keyframes cat-pulse {
+	0%, 100% { scale: 1; }
+	50% { scale: 1.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cat-dancer { animation: none; transition: none; }
+	.win-catstage-lights { animation: none; }
+}
+
 /* Home dims slightly while a window is open */
 
 #os.window-open .home-grid {
