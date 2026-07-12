@@ -68,8 +68,8 @@ const FOLDERS = {
 		label: "Game",
 		desc: "웹게임",
 		items: [
+			{ href: "https://starspick.zerossin.com/", img: "assets/images/logo-prompt-arena.png", title: "심심한 성좌님" },
 			{ href: "https://dice.zerossin.com/", img: "assets/images/logo-dice-battle.png", title: "다이스 필드" },
-			{ href: "https://starspick.zerossin.com/", img: "assets/images/logo-prompt-arena.png", title: "별들의 선택" },
 			{ href: "https://gitpage.zerossin.com/js-rhythm-game/", img: "assets/images/logo-js-rhythm-game.png", title: "리듬게임" },
 			{ href: "https://github.com/zerossin/python-korean-word-chain-game", img: "assets/images/logo_word_chain_game.png", title: "끝말잇기" },
 		],
