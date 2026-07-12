@@ -90,7 +90,13 @@ button {
 	   so a row is always exactly "one icon tall" no matter the viewport width */
 	grid-template-columns: repeat(6, 1fr);
 	grid-auto-rows: auto;
-	grid-auto-flow: dense;
+	/* dense가 아니라 기본(순서대로) 배치 — 재배치 드래그가 "DOM 순서상 어디에
+	   끼워 넣을지"만 정하고 나머지는 grid가 알아서 자리를 계산하게 하는데,
+	   dense를 쓰면 이후 항목이 앞의 빈 칸을 채우려고 순서를 건너뛸 수 있어
+	   "커서 위치 → DOM 순서" 판단이 어긋날 수 있다. 대신 큰 항목 옆에 자투리
+	   칸이 남으면(예: 위젯 하나만 있는 줄) 그 칸은 그냥 비워두고 다음 항목은
+	   다음 줄부터 시작 — 이미지 옆에 글이 흐르다 안 맞으면 다음 줄로 넘어가는
+	   것과 같은 원리, 예측 가능함이 우선이라 이 쪽을 택함. */
 	gap: var(--gap);
 	justify-items: stretch;
 	align-items: stretch;
@@ -126,8 +132,14 @@ button {
 	   right for a fixed-size .app-icon, wrong here. align-self:stretch
 	   fills the wrapper's width instead, correctly leaving room for the
 	   margin-inline below (unlike width:100%, which would overflow by
-	   2x the margin since it doesn't know about it). */
+	   2x the margin since it doesn't know about it). flex:1 does the same
+	   job for HEIGHT — without it, whichever widget has less content just
+	   renders shorter than its slot instead of matching its sibling, since
+	   the two widget-slots share the same grid row height but nothing was
+	   telling the card itself to fill it. */
 	align-self: stretch;
+	flex: 1 1 auto;
+	min-height: 0;
 	/* An app-icon is a FIXED size, smaller than its grid column, and sits
 	   centered in the leftover space — so a column's visible content doesn't
 	   reach the column's true track edge. A widget card, with no inset of
@@ -344,20 +356,34 @@ button {
 
 /* ----------------------------------------------------------------
    Jiggle mode — long-press an icon to rearrange, like a real OS.
-   Widgets (.widget-slot) sit this out, they're a different footprint.
-   ---------------------------------------------------------------- */
+   Widgets are just big apps, so they jiggle/drag/reflow exactly like
+   any other app — same rotation, just a smaller angle, since `rotate`
+   pivots around the element's own center and a widget's edges sit much
+   further from that center than a 1x1 icon's do (same angle → much more
+   linear travel at the corners). Scaling the amplitude down keeps the
+   apparent wobble similar regardless of size — not a different
+   animation, just a smaller number plugged into the same one. */
 
 @keyframes icon-jiggle {
 	0%, 100% { rotate: -1.4deg; }
 	50% { rotate: 1.4deg; }
 }
 
-.home-grid.jiggle > .app:not(.widget-slot) {
+.home-grid.jiggle > .app {
 	animation: icon-jiggle 0.16s ease-in-out infinite;
 	touch-action: none; /* 흔들기 모드에서만 터치 스크롤을 막아 드래그와 안 겹치게 */
 }
 
-.home-grid.jiggle > .app:not(.widget-slot):nth-child(even) {
+.home-grid.jiggle > .app.widget-slot {
+	animation-name: icon-jiggle-wide;
+}
+
+@keyframes icon-jiggle-wide {
+	0%, 100% { rotate: -0.45deg; }
+	50% { rotate: 0.45deg; }
+}
+
+.home-grid.jiggle > .app:nth-child(even) {
 	animation-delay: -0.08s;
 }
 
@@ -372,7 +398,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.home-grid.jiggle > .app:not(.widget-slot) { animation: none; }
+	.home-grid.jiggle > .app { animation: none; }
 }
 
 /* Folder icon: same outline as an app icon, 3x3 mini apps inside */

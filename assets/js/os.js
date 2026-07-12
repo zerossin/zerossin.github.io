@@ -215,10 +215,12 @@ function renderSkillWidget() {
 	return w;
 }
 
-// 위젯도 결국 "칸을 여러 개 차지하는 큰 앱" 취급 — 앱과 똑같이 밑에 이름표를 단다.
-// 그래야 위젯이 몇 개든, 어디로 옮기든 정렬/간격 규칙을 따로 신경 쓸 필요가 없다.
-function wrapAsWidgetApp(label, widgetEl) {
+// 위젯도 결국 "칸을 여러 개 차지하는 큰 앱" 취급 — 앱과 똑같이 밑에 이름표를 달고,
+// 똑같이 dataset.appId를 갖는다. 그래야 재배치 시스템이 위젯이라고 따로 봐줄 필요 없이
+// "같은 크기(3x2)끼리는 자리를 바꿀 수 있다"는 일반 규칙 하나로 위젯도 자연히 포함된다.
+function wrapAsWidgetApp(id, label, widgetEl) {
 	const wrapper = el("div", "app widget-slot");
+	wrapper.dataset.appId = id;
 	wrapper.appendChild(widgetEl);
 	wrapper.appendChild(el("span", "app-label", label));
 	return wrapper;
@@ -468,9 +470,24 @@ function loadOrder(defaultIds) {
 	} catch (e) {
 		saved = [];
 	}
-	const known = saved.filter((id) => defaultIds.includes(id));
-	const rest = defaultIds.filter((id) => !known.includes(id)); // 저장 이후 새로 추가된 앱은 뒤에 붙음
-	return [...known, ...rest];
+	const savedKnown = saved.filter((id) => defaultIds.includes(id));
+	if (savedKnown.length === 0) return defaultIds; // 저장된 적 없으면 그냥 기본 순서 그대로
+
+	// 저장 이후 새로 추가된 id(예: 이번에 재배치 대상으로 편입된 위젯)는 무조건
+	// 맨 끝으로 밀어버리지 않고, 원래 기본 순서에서 있던 자리 — 바로 앞의
+	// "저장에도 있던" id 뒤 — 에 끼워 넣는다. 그래야 새 항목이 뜬금없이 맨
+	// 끝에 나타나지 않고 원래 의도한 위치 근처에 자연스럽게 자리잡는다.
+	const result = [...savedKnown];
+	let afterIndex = -1;
+	defaultIds.forEach((id) => {
+		if (savedKnown.includes(id)) {
+			afterIndex = result.indexOf(id);
+		} else {
+			afterIndex += 1;
+			result.splice(afterIndex, 0, id);
+		}
+	});
+	return result;
 }
 
 function saveOrder(ids) {
@@ -482,23 +499,36 @@ function saveOrder(ids) {
 }
 
 /* ---------------- 아이콘 흔들기(jiggle) & 드래그 재배치 ----------------
-   길게 누르면 흔들리기 시작(iOS jiggle mode), 그 상태에서 끌면 가장
-   가까운 다른 아이콘과 자리를 바꾼다. 위젯(About/Skill)은 칸 크기가
-   달라 재배치 대상에서 제외 — 일반 앱/폴더만 순서를 바꿀 수 있다. */
+   길게 누르면 흔들리기 시작(iOS jiggle mode). 위젯은 "칸을 여러 개 차지
+   하는 큰 앱"일 뿐 — 재배치 로직은 위젯이든 1x1 앱이든 완전히 똑같이
+   다룬다: 드래그 중인 항목을 DOM 순서상 어디에 끼워 넣을지만 정하고,
+   나머지 항목들이 자기 자리를 어디로 옮길지는 전부 CSS grid의 자동 배치
+   계산에 맡긴다. 위젯을 옮기면 그 칸을 차지하던 앱들이 스르르 밀려나는
+   건 "위젯이라서" 특별히 처리한 게 아니라, grid가 자기 자리 계산을 다시
+   한 것뿐 — 크기가 다른 만큼 화면에 나타나는 결과가 다를 뿐이다. */
 
 let jiggling = false;
 let dragNode = null;
-let dragBaseRect = null; // dragNode의 "자연"(transform 없는) 위치 — 스왑마다 다시 잼
+let dragBaseRect = null; // dragNode의 "자연"(transform 없는) 위치 — 자리를 옮길 때마다 다시 잼
 let dragBasePointer = null; // 위 기준을 잰 시점의 포인터 좌표
 let pressState = null;
-let lastSwapAt = 0;
+let lastMoveAt = 0;
 
 const LONG_PRESS_MS = 450;
 const MOVE_CANCEL_PX = 10;
-const SWAP_DEBOUNCE_MS = 180; // 두 아이콘 사이 경계에서 계속 왔다갔다 스왑되는 것 방지
+const MOVE_DEBOUNCE_MS = 180; // 경계에서 계속 왔다갔다 자리바꿈되는 것 방지
 
 function getReorderableNodes() {
-	return [...home.querySelectorAll(":scope > .app:not(.widget-slot)")];
+	return [...home.querySelectorAll(":scope > .app")];
+}
+
+// 포인터가 rect의 "앞쪽"(읽는 순서 기준 — 위쪽이거나, 같은 줄이면 왼쪽)에 있는지.
+// 위젯처럼 큰 항목은 세로 폭이 넓어서, 세로로 확실히 차이 나지 않는 이상은
+// 가로 위치로 앞/뒤를 가른다.
+function isBeforeInReadingOrder(pointerX, pointerY, rect) {
+	const cy = rect.top + rect.height / 2;
+	if (Math.abs(pointerY - cy) > rect.height * 0.3) return pointerY < cy;
+	return pointerX < rect.left + rect.width / 2;
 }
 
 function enterJiggleMode() {
@@ -526,19 +556,6 @@ function exitJiggleMode() {
 	saveOrder(getReorderableNodes().map((n) => n.dataset.appId));
 }
 
-function swapNodes(a, b) {
-	const aNext = a.nextSibling;
-	const bNext = b.nextSibling;
-	if (aNext === b) {
-		home.insertBefore(b, a);
-	} else if (bNext === a) {
-		home.insertBefore(a, b);
-	} else {
-		home.insertBefore(a, bNext);
-		home.insertBefore(b, aNext);
-	}
-}
-
 function beginDrag(node, pointerId, clientX, clientY) {
 	dragNode = node;
 	node.classList.add("dragging");
@@ -552,18 +569,37 @@ function beginDrag(node, pointerId, clientX, clientY) {
 	}
 }
 
-// 드래그로 밀려나는 아이콘 vs 손가락을 따라가는 아이콘, 둘 다 "순간이동"처럼
-// 안 보이게 하는 FLIP 기법: 옮기기 전 위치를 재고(First) → DOM을 실제로
-// 옮긴 뒤(Last) → 그 차이만큼 역방향 transform을 즉시 걸어 시각적으로는 그대로
-// 있는 것처럼 만들고(Invert) → 다음 프레임에 transform을 0으로 애니메이션
-// 시키면(Play) 실제로는 순간이동했지만 눈에는 미끄러지듯 이동한 것처럼 보인다.
-function performSwap(other, pointerX, pointerY) {
+// 드래그 중인 항목을 DOM 순서상 targetRef 앞에 끼워 넣는다(targetRef가 null이면
+// 맨 끝). 이 한 번의 DOM 변경으로 CSS grid가 다른 모든 항목의 자리를 다시
+// 계산하므로, "밀려나는" 효과 자체는 grid가 공짜로 해준다 — 우리가 할 일은
+// 그 이동을 눈에 보이게 부드럽게 만드는 것뿐이다(FLIP: 옮기기 전 모든 항목의
+// 위치를 재고(First) → DOM을 옮긴 뒤(Last) → 자리가 바뀐 항목마다 그 차이만큼
+// 역방향 transform을 즉시 걸었다가(Invert) 다음 프레임에 0으로 애니메이션
+// (Play)한다). 드래그 중인 항목 자신은 같은 원리로 손가락을 계속 따라가도록
+// 기준점만 다시 잡는다.
+function moveDraggedTo(targetRef, pointerX, pointerY) {
+	const others = getReorderableNodes().filter((n) => n !== dragNode);
+	const beforeRects = new Map(others.map((n) => [n, n.getBoundingClientRect()]));
 	const dragVisualBefore = dragNode.getBoundingClientRect();
-	const otherRectBefore = other.getBoundingClientRect();
 
-	swapNodes(dragNode, other);
+	home.insertBefore(dragNode, targetRef);
 
-	// 드래그 중인 아이콘: 새 grid 자리로 옮겨졌지만, 지금 보이던 자리 그대로
+	others.forEach((n) => {
+		const before = beforeRects.get(n);
+		const after = n.getBoundingClientRect();
+		const dx = before.left - after.left;
+		const dy = before.top - after.top;
+		if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return; // 안 움직인 항목은 손댈 필요 없음
+		n.style.transition = "none";
+		n.style.transform = `translate(${dx}px, ${dy}px)`;
+		requestAnimationFrame(() => {
+			n.style.transition = "transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1)";
+			n.style.transform = "";
+			n.addEventListener("transitionend", () => { n.style.transition = ""; }, { once: true });
+		});
+	});
+
+	// 드래그 중인 항목: 새 grid 자리로 옮겨졌지만, 지금 보이던 자리 그대로
 	// 이어서 손가락을 따라가도록 기준점을 다시 잡는다(안 그러면 순간 점프해 보임).
 	dragNode.style.transform = "none";
 	const dragNaturalAfter = dragNode.getBoundingClientRect();
@@ -573,19 +609,7 @@ function performSwap(other, pointerX, pointerY) {
 	dragBaseRect = dragNaturalAfter;
 	dragBasePointer = { x: pointerX - neededDX, y: pointerY - neededDY };
 
-	// 밀려난 아이콘: 원래 있던 자리 → 새 자리로 부드럽게 슬라이드
-	const otherRectAfter = other.getBoundingClientRect();
-	const odx = otherRectBefore.left - otherRectAfter.left;
-	const ody = otherRectBefore.top - otherRectAfter.top;
-	other.style.transition = "none";
-	other.style.transform = `translate(${odx}px, ${ody}px)`;
-	requestAnimationFrame(() => {
-		other.style.transition = "transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1)";
-		other.style.transform = "";
-		other.addEventListener("transitionend", () => { other.style.transition = ""; }, { once: true });
-	});
-
-	lastSwapAt = performance.now();
+	lastMoveAt = performance.now();
 }
 
 function onDragMove(e) {
@@ -596,7 +620,7 @@ function onDragMove(e) {
 	const dy = e.clientY - dragBasePointer.y;
 	dragNode.style.transform = `translate(${dx}px, ${dy}px)`;
 
-	if (performance.now() - lastSwapAt < SWAP_DEBOUNCE_MS) return; // 경계에서 계속 스왑되는 것 방지
+	if (performance.now() - lastMoveAt < MOVE_DEBOUNCE_MS) return; // 경계에서 계속 왔다갔다 하는 것 방지
 
 	const others = getReorderableNodes().filter((n) => n !== dragNode);
 	let closest = null;
@@ -609,9 +633,12 @@ function onDragMove(e) {
 			closest = n;
 		}
 	});
-	if (closest && closestDist < dragBaseRect.width * 0.6) {
-		performSwap(closest, e.clientX, e.clientY);
-	}
+	if (!closest) return;
+
+	const closestRect = closest.getBoundingClientRect();
+	const targetRef = isBeforeInReadingOrder(e.clientX, e.clientY, closestRect) ? closest : closest.nextSibling;
+	if (targetRef === dragNode || dragNode.nextSibling === targetRef) return; // 이미 그 자리면 아무것도 안 함
+	moveDraggedTo(targetRef, e.clientX, e.clientY);
 }
 
 function endDrag() {
@@ -696,11 +723,21 @@ function initReorder() {
 
 /* ---------------- 초기화 ---------------- */
 
-home.appendChild(wrapAsWidgetApp("About", renderAboutWidget()));
-home.appendChild(wrapAsWidgetApp("Skill", renderSkillWidget()));
+// 위젯도 일반 앱과 똑같이 하나의 순서 목록에 들어간다 — 재배치/저장 로직이
+// "위젯이면 이렇게, 앱이면 저렇게" 나뉘지 않고 전부 이 id 목록 하나로 처리된다.
+const WIDGETS = [
+	{ id: "about", label: "About", render: renderAboutWidget },
+	{ id: "skill", label: "Skill", render: renderSkillWidget },
+];
 
-const orderedIds = loadOrder(APPS.map((a) => a.id));
+const allIds = [...WIDGETS.map((w) => w.id), ...APPS.map((a) => a.id)];
+const orderedIds = loadOrder(allIds);
 orderedIds.forEach((id) => {
+	const widget = WIDGETS.find((w) => w.id === id);
+	if (widget) {
+		home.appendChild(wrapAsWidgetApp(widget.id, widget.label, widget.render()));
+		return;
+	}
 	const app = APPS.find((a) => a.id === id);
 	if (app) home.appendChild(renderApp(app));
 });
