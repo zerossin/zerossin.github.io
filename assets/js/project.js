@@ -2,81 +2,81 @@
 const projectsByCategory = {
     research: [
         {
-            href: "https://github.com/pulqum/MonoDETR-Weather3D",
+            href: "https://github.com/zerossin/MonoDETR-Weather3D",
             imgSrc: "assets/images/logo_MonoDETR-Weather3D.png",
             title: "MonoDETR-Weather3D",
         },
         {
-            href: "https://github.com/pulqum/MonoDETR-Weather3D",
+            href: "https://github.com/zerossin/MonoDETR-Weather3D",
             imgSrc: "assets/images/logo_gen-clear-drive.jpg",
             title: "gen-clear-drive",
         },
         {
-            href: "https://github.com/pulqum/room-classifier",
+            href: "https://github.com/zerossin/room-classifier",
             imgSrc: "assets/images/logo_indoor.png",
             title: "YOLOv5- room classifier",
         },
     ],
     lab: [
         {
-            href: "https://github.com/pulqum/Disa-Project",
+            href: "https://github.com/zerossin/Disa-Project",
             imgSrc: "assets/images/logo_disa_project.png",
             title: "DISA Project",
         },
         {
-            href: "https://github.com/pulqum/desklog",
+            href: "https://github.com/zerossin/desklog",
             imgSrc: "assets/images/logo-desklog.png",
             title: "Desk Log",
         },
         {
-            href: "https://github.com/pulqum/database-project",
+            href: "https://github.com/zerossin/database-project",
             imgSrc: "assets/images/database-project.jpeg",
             title: "database project",
         },
         {
-            href: "https://test.pulqum.com/",
+            href: "https://test.zerossin.com/",
             imgSrc: "assets/images/logo-image-converter.png",
             title: "image converter",
         },
         {
-            href: "https://github.com/pulqum/youtube-music-downloader",
+            href: "https://github.com/zerossin/youtube-music-downloader",
             imgSrc: "assets/images/imsi.png",
             title: "youtube music downloader",
         },
         {
-            href: "https://gitpage.pulqum.com/source-code-scanner/",
+            href: "https://gitpage.zerossin.com/source-code-scanner/",
             imgSrc: "assets/images/logo-source-code-scanner.png",
             title: "Source Code Scanner",
         },
         {
-            href: "https://github.com/pulqum/guminai",
+            href: "https://github.com/zerossin/guminai",
             imgSrc: "assets/images/guminai.png",
             title: "guminai",
         },
         {
-            href: "https://map.pulqum.com/",
+            href: "https://map.zerossin.com/",
             imgSrc: "assets/images/logo_mc_map.png",
             title: "Map",
         },
     ],
     game: [
         {
-            href: "https://dice.pulqum.com/",
+            href: "https://dice.zerossin.com/",
             imgSrc: "assets/images/logo-dice-battle.png",
             title: "다이스 필드",
         },
         {
-            href: "https://starspick.pulqum.com/",
+            href: "https://starspick.zerossin.com/",
             imgSrc: "assets/images/logo-prompt-arena.png",
             title: "별들의 선택",
         },
         {
-            href: "https://gitpage.pulqum.com/js-rhythm-game/",
+            href: "https://gitpage.zerossin.com/js-rhythm-game/",
             imgSrc: "assets/images/logo-js-rhythm-game.png",
             title: "리듬게임",
         },
         {
-            href: "https://github.com/pulqum/python-korean-word-chain-game",
+            href: "https://github.com/zerossin/python-korean-word-chain-game",
             imgSrc: "assets/images/logo_word_chain_game.png",
             title: "Korean word chain game",
         },

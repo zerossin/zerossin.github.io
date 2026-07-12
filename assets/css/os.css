@@ -1,0 +1,626 @@
+/* ===================================================================
+   Zerossin OS — Home Screen
+   =================================================================== */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+:root {
+	/* single source of truth: every app icon is exactly this square,
+	   and every grid track (column width, row height) is derived from it —
+	   this is what keeps icons from ever stretching and keeps widgets
+	   aligned to a whole number of icon-cells, like a real OS home screen. */
+	--icon: clamp(56px, 8vw, 124px);
+	--gap: clamp(14px, 1.8vw, 28px);
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+	color: #1d1d1f;
+	background:
+		linear-gradient(rgba(29, 29, 31, 0.035) 1px, transparent 1px) 0 0 / 100% 44px,
+		linear-gradient(165deg, #f4f4f2 0%, #ebecee 55%, #e4e6ea 100%);
+	min-height: 100vh;
+}
+
+a { color: inherit; }
+
+img { max-width: 100%; display: block; }
+
+button {
+	font: inherit;
+	color: inherit;
+	background: none;
+	border: none;
+	cursor: pointer;
+}
+
+/* ----------------------------------------------------------------
+   Frame
+   ---------------------------------------------------------------- */
+
+#os {
+	max-width: 1560px;
+	margin: 0 auto;
+	padding: 0 clamp(16px, 3vw, 48px) 64px;
+}
+
+.os-statusbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: clamp(18px, 2vw, 28px) 6px clamp(26px, 3vw, 44px);
+	font-size: clamp(0.85rem, 1vw, 1.05rem);
+	font-weight: 600;
+	color: rgba(29, 29, 31, 0.55);
+	letter-spacing: 0.02em;
+}
+
+.os-footer {
+	margin-top: 56px;
+	text-align: center;
+	font-size: 0.75rem;
+	color: rgba(29, 29, 31, 0.4);
+}
+
+.os-footer a { text-decoration: none; }
+.os-footer a:hover { text-decoration: underline; }
+
+/* ----------------------------------------------------------------
+   Home Grid — every element occupies grid units
+   ---------------------------------------------------------------- */
+
+.home-grid {
+	display: grid;
+	/* Column COUNT is fixed per breakpoint (see media queries below) rather than
+	   fluid auto-fill — real OS home screens re-flow into a different number of
+	   columns at a few discrete sizes, they don't shrink icons continuously
+	   forever before finally changing the arrangement. Icon SIZE (--icon) is a
+	   single continuous formula shared by every tier, so crossing a breakpoint
+	   never makes icons visibly jump — only the column count changes.
+	   row height is left to size itself off actual content (icon + gap + label),
+	   so a row is always exactly "one icon tall" no matter the viewport width */
+	grid-template-columns: repeat(6, 1fr);
+	grid-auto-rows: auto;
+	grid-auto-flow: dense;
+	gap: var(--gap);
+	justify-items: stretch;
+	align-items: stretch;
+}
+
+@media (max-width: 767px) {
+	.home-grid { grid-template-columns: repeat(5, 1fr); }
+}
+
+@media (max-width: 479px) {
+	.home-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ----------------------------------------------------------------
+   Widgets — 3 columns x 2 rows (3 x 1 on narrow screens)
+   ---------------------------------------------------------------- */
+
+.widget {
+	grid-column: span 3;
+	grid-row: span 2;
+	/* An app-icon is a FIXED size, smaller than its grid column, and sits
+	   centered in the leftover space — so a column's visible content doesn't
+	   reach the column's true track edge. A widget card, with no inset of
+	   its own, was filling its track edge-to-edge, so it stuck out past
+	   where an icon's own right/left edge actually sits. This computes that
+	   same per-column inset — (columnWidth − icon) / 2 — from the widget's
+	   OWN resolved width (100% here = this widget's k-column span), and
+	   applies it as the widget's outer margin so both edges land exactly on
+	   the icon edges, for any span width k: solve columnWidth from
+	   100% = k·columnWidth + (k−1)·gap, then inset = (columnWidth − icon)/2. */
+	margin-inline: calc((100% - 2 * var(--gap) - 3 * var(--icon)) / 6);
+	/* A widget's bottom edge sits flush on its row's grid line, but an app
+	   icon's bottom edge doesn't — there's a label below it (icon's own
+	   flex-gap of 7px, then the label line) before that row's true grid
+	   line. Without this, the widget looks closer to the row below it than
+	   two icon rows look to each other. 1.32 approximates this browser's
+	   line-height/font-size ratio for .app-label — matched by measurement,
+	   not exact font metrics, but within a sub-pixel in testing. */
+	margin-bottom: calc(7px + 1.32 * clamp(0.74rem, 0.95vw, 0.95rem));
+	border-radius: clamp(26px, 2.6vw, 38px);
+	padding: clamp(18px, 2.2vw, 34px);
+	overflow: hidden;
+	background: linear-gradient(150deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.45));
+	-webkit-backdrop-filter: blur(18px) saturate(1.5);
+	backdrop-filter: blur(18px) saturate(1.5);
+	border: 1px solid rgba(255, 255, 255, 0.75);
+	box-shadow:
+		0 12px 28px rgba(29, 29, 31, 0.08),
+		inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.widget-title {
+	font-size: clamp(0.72rem, 0.85vw, 0.9rem);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: rgba(29, 29, 31, 0.45);
+	margin-bottom: 12px;
+}
+
+/* About widget */
+
+.widget-about {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 10px;
+}
+
+.about-head {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.about-avatar {
+	width: clamp(64px, 7vw, 104px);
+	height: clamp(64px, 7vw, 104px);
+	border-radius: 50%;
+	object-fit: cover;
+	flex: none;
+	border: 2px solid rgba(255, 255, 255, 0.9);
+	box-shadow: 0 4px 10px rgba(29, 29, 31, 0.12);
+}
+
+.about-name {
+	font-size: clamp(1.25rem, 2vw, 1.9rem);
+	font-weight: 800;
+	letter-spacing: -0.01em;
+}
+
+.about-intro {
+	font-size: clamp(0.82rem, 1.05vw, 1.02rem);
+	line-height: 1.45;
+	color: rgba(29, 29, 31, 0.65);
+}
+
+.about-links {
+	display: flex;
+	gap: 8px;
+}
+
+.about-links a {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: clamp(0.75rem, 0.85vw, 0.92rem);
+	font-weight: 600;
+	text-decoration: none;
+	color: rgba(29, 29, 31, 0.75);
+	background: rgba(255, 255, 255, 0.65);
+	border: 1px solid rgba(29, 29, 31, 0.08);
+	border-radius: 999px;
+	padding: 0.35em 0.9em;
+	transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.about-links a:hover {
+	transform: scale(1.05);
+	background: rgba(255, 255, 255, 0.95);
+}
+
+.about-links svg {
+	width: 1.15em;
+	height: 1.15em;
+	fill: currentColor;
+}
+
+/* Skill widget */
+
+.widget-skill {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.skill-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: clamp(10px, 1.5vw, 24px) clamp(8px, 1vw, 16px);
+}
+
+.skill-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+}
+
+.skill-item img {
+	width: clamp(40px, 4.2vw, 68px);
+	height: clamp(40px, 4.2vw, 68px);
+	object-fit: contain;
+	border-radius: 22.5%;
+	background: rgba(255, 255, 255, 0.75);
+	padding: clamp(6px, 0.7vw, 11px);
+	border: 1px solid rgba(29, 29, 31, 0.06);
+	box-shadow: 0 2px 6px rgba(29, 29, 31, 0.07);
+}
+
+.skill-item span {
+	font-size: clamp(0.66rem, 0.75vw, 0.82rem);
+	font-weight: 600;
+	color: rgba(29, 29, 31, 0.6);
+	white-space: nowrap;
+}
+
+/* ----------------------------------------------------------------
+   App icons — every app is exactly 1 x 1
+   ---------------------------------------------------------------- */
+
+.app {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 7px;
+	text-decoration: none;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.app-icon {
+	/* fixed square, always — never a percentage of a fluid parent, so it
+	   can't be stretched/squished by grid or flex recalculating around it */
+	width: var(--icon);
+	height: var(--icon);
+	flex: none;
+	border-radius: 22.5%;
+	overflow: hidden;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(150deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.55));
+	border: 1px solid rgba(255, 255, 255, 0.8);
+	box-shadow:
+		0 8px 18px rgba(29, 29, 31, 0.1),
+		inset 0 1px 0 rgba(255, 255, 255, 0.85);
+	transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.app-icon svg {
+	width: 58%;
+	height: 58%;
+}
+
+.app-icon > img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.app:hover .app-icon {
+	transform: scale(1.08);
+	box-shadow: 0 12px 24px rgba(29, 29, 31, 0.14);
+}
+
+.app:active .app-icon {
+	transform: scale(0.92);
+	filter: blur(0.6px) brightness(0.96);
+}
+
+.app-label {
+	font-size: clamp(0.74rem, 0.95vw, 0.95rem);
+	font-weight: 600;
+	color: rgba(29, 29, 31, 0.7);
+	text-align: center;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* Folder icon: same outline as an app icon, 3x3 mini apps inside */
+
+.app-icon.is-folder {
+	background: linear-gradient(150deg, rgba(255, 255, 255, 0.6), rgba(240, 241, 244, 0.45));
+	-webkit-backdrop-filter: blur(14px) saturate(1.4);
+	backdrop-filter: blur(14px) saturate(1.4);
+	padding: 11%;
+}
+
+.folder-minis {
+	width: 100%;
+	height: 100%;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows: repeat(3, 1fr);
+	gap: 7%;
+}
+
+.folder-minis .mini {
+	border-radius: 22%;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.85);
+	box-shadow: 0 1px 2px rgba(29, 29, 31, 0.12);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.folder-minis .mini img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.folder-minis .mini.letter {
+	font-size: 8px;
+	font-weight: 800;
+	color: #fff;
+}
+
+.folder-minis .mini.empty {
+	background: rgba(29, 29, 31, 0.05);
+	box-shadow: none;
+}
+
+/* ----------------------------------------------------------------
+   OS Window
+   ---------------------------------------------------------------- */
+
+.os-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+
+.os-backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(230, 231, 235, 0.35);
+	-webkit-backdrop-filter: blur(10px) saturate(1.2);
+	backdrop-filter: blur(10px) saturate(1.2);
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.os-modal.open .os-backdrop { opacity: 1; }
+
+.os-window {
+	position: relative;
+	width: min(78vw, 1040px);
+	max-height: min(80vh, 820px);
+	display: flex;
+	flex-direction: column;
+	border-radius: clamp(22px, 1.6vw, 30px);
+	background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(250, 250, 252, 0.85));
+	-webkit-backdrop-filter: blur(24px) saturate(1.6);
+	backdrop-filter: blur(24px) saturate(1.6);
+	border: 1px solid rgba(255, 255, 255, 0.85);
+	box-shadow: 0 30px 70px rgba(29, 29, 31, 0.22);
+	opacity: 0;
+	transition: transform 0.34s cubic-bezier(0.32, 0.9, 0.35, 1), opacity 0.26s ease;
+	will-change: transform, opacity;
+}
+
+.os-modal.open .os-window {
+	transform: none !important;
+	opacity: 1;
+}
+
+.os-window-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: clamp(14px, 1.4vw, 22px) clamp(18px, 1.8vw, 28px);
+	border-bottom: 1px solid rgba(29, 29, 31, 0.07);
+	flex: none;
+}
+
+.os-window-bar .win-close {
+	width: clamp(13px, 1vw, 16px);
+	height: clamp(13px, 1vw, 16px);
+	border-radius: 50%;
+	background: #ff5f57;
+	border: 1px solid rgba(0, 0, 0, 0.12);
+	flex: none;
+	transition: transform 0.15s ease;
+}
+
+.os-window-bar .win-close:hover { transform: scale(1.15); }
+
+.os-window-bar h2 {
+	font-size: clamp(0.92rem, 1.15vw, 1.15rem);
+	font-weight: 700;
+	flex: 1;
+	text-align: center;
+	/* keep the title optically centered despite the close dot */
+	margin-right: 23px;
+}
+
+.os-window-body {
+	padding: clamp(22px, 2.2vw, 36px);
+	overflow-y: auto;
+}
+
+/* Folder window contents — same 1x1 app icons */
+
+.win-app-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--icon), 1fr));
+	grid-auto-rows: auto;
+	gap: clamp(24px, 2.4vw, 38px);
+}
+
+.win-app-grid .app-icon.letter-tile {
+	font-size: clamp(1.5rem, 2vw, 2rem);
+	font-weight: 800;
+	color: #fff;
+}
+
+/* Gallery window */
+
+.win-gallery {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 15vw, 220px), 1fr));
+	gap: clamp(10px, 1.2vw, 18px);
+}
+
+.win-gallery img {
+	width: 100%;
+	aspect-ratio: 1;
+	object-fit: cover;
+	border-radius: 12px;
+}
+
+/* History window */
+
+.win-timeline {
+	list-style: none;
+	position: relative;
+	padding-left: 22px;
+}
+
+.win-timeline::before {
+	content: "";
+	position: absolute;
+	left: 5px;
+	top: 6px;
+	bottom: 6px;
+	width: 2px;
+	background: rgba(29, 29, 31, 0.12);
+	border-radius: 1px;
+}
+
+.win-timeline li {
+	position: relative;
+	padding: 0 0 18px;
+}
+
+.win-timeline li:last-child { padding-bottom: 0; }
+
+.win-timeline li::before {
+	content: "";
+	position: absolute;
+	left: -22px;
+	top: 5px;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #fff;
+	border: 3px solid #5f9c68;
+	box-shadow: 0 1px 3px rgba(29, 29, 31, 0.15);
+}
+
+.win-timeline .when {
+	font-size: 0.74rem;
+	font-weight: 700;
+	color: rgba(29, 29, 31, 0.45);
+	letter-spacing: 0.03em;
+}
+
+.win-timeline .what {
+	font-size: 0.92rem;
+	font-weight: 600;
+	margin-top: 2px;
+}
+
+/* Placeholder window (Canvas) */
+
+.win-placeholder {
+	text-align: center;
+	padding: 36px 10px;
+	color: rgba(29, 29, 31, 0.5);
+	font-size: 0.92rem;
+	line-height: 1.6;
+}
+
+.win-placeholder .big {
+	font-size: 2rem;
+	margin-bottom: 10px;
+}
+
+/* Home dims slightly while a window is open */
+
+#os.window-open .home-grid {
+	transform: scale(0.985);
+}
+
+.home-grid { transition: transform 0.34s ease; }
+
+/* ----------------------------------------------------------------
+   Narrow screens (5-col and 4-col tiers): widgets go full-width x 1 row
+   and stack (About above Skill) instead of sitting side by side — a
+   half-width 2-row box is too cramped for the avatar + intro + links.
+   ---------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+	.widget {
+		grid-column: span 5;
+		grid-row: span 1;
+		/* k=5 here (this tier's widget spans all 5 columns) */
+		margin-inline: calc((100% - 4 * var(--gap) - 5 * var(--icon)) / 10);
+		padding: 12px 14px;
+		border-radius: 22px;
+	}
+
+	.widget-title { margin-bottom: 8px; }
+
+	.widget-about { gap: 6px; }
+
+	.widget-about .widget-title { display: none; }
+
+	.about-avatar { width: 46px; height: 46px; }
+
+	.about-name { font-size: 1.05rem; }
+
+	.about-intro { display: none; }
+
+	.about-head { gap: 10px; flex: 1; }
+
+	.widget-about {
+		flex-direction: row;
+		align-items: center;
+	}
+
+	.about-links { flex-direction: column; gap: 5px; }
+
+	.about-links a { padding: 3px 9px; font-size: 0.68rem; }
+
+	.skill-grid { grid-template-columns: repeat(6, 1fr); gap: 6px 4px; }
+
+	.skill-item img { width: 30px; height: 30px; padding: 4px; }
+
+	/* "PostgreSQL" etc. are wider than a 30px icon while nowrap — with 6
+	   columns that forced the widget wider than its own grid-column span
+	   (a CSS Grid item's default min-width:auto lets content overflow its
+	   track). Icon-only in compact mode avoids the overflow entirely and
+	   matches how real OS widgets don't caption every item anyway. */
+	.skill-item span { display: none; }
+}
+
+@media (max-width: 479px) {
+	:root {
+		/* phones get their own fixed size class — bigger icon, tighter gap —
+		   rather than inheriting the tablet tier's shared formula pinned at
+		   its floor, which left too much dead space around each icon.
+		   --gap lives here (not a one-off `.home-grid{gap:10px}`) so the
+		   widget's margin-inline formula below picks up the same value. */
+		--icon: clamp(64px, 17vw, 84px);
+		--gap: 10px;
+	}
+
+	.widget {
+		grid-column: span 4;
+		/* k=4 here (this tier's widget spans all 4 columns) */
+		margin-inline: calc((100% - 3 * var(--gap) - 4 * var(--icon)) / 8);
+	}
+
+	.skill-item img { width: 34px; height: 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.os-window, .os-backdrop, .home-grid, .app-icon { transition: none !important; }
+}
