@@ -99,12 +99,29 @@ button {
 }
 
 /* ----------------------------------------------------------------
-   Widgets — 3 columns x 2 rows (3 x 1 on narrow screens)
+   Widgets are not a special grid citizen — they're just a big .app:
+   the same wrapper (icon-slot + .app-label below it) as every other
+   app, just spanning more than 1x1. .widget-slot carries the grid
+   span (the "how many app-cells wide/tall" part); .widget is the
+   visible card that sits where an .app-icon normally would, and it
+   picks up an .app-label underneath exactly like any other app —
+   so the label's own gap/line-height IS the row's real content,
+   no separate approximation needed to match icon-row spacing.
+   3 columns x 2 rows on desktop, full-width x 1 row on narrow screens.
    ---------------------------------------------------------------- */
 
-.widget {
+.widget-slot {
 	grid-column: span 3;
 	grid-row: span 2;
+}
+
+.widget {
+	/* .app centers its child at the child's own (shrink-to-fit) size —
+	   right for a fixed-size .app-icon, wrong here. align-self:stretch
+	   fills the wrapper's width instead, correctly leaving room for the
+	   margin-inline below (unlike width:100%, which would overflow by
+	   2x the margin since it doesn't know about it). */
+	align-self: stretch;
 	/* An app-icon is a FIXED size, smaller than its grid column, and sits
 	   centered in the leftover space — so a column's visible content doesn't
 	   reach the column's true track edge. A widget card, with no inset of
@@ -116,14 +133,6 @@ button {
 	   the icon edges, for any span width k: solve columnWidth from
 	   100% = k·columnWidth + (k−1)·gap, then inset = (columnWidth − icon)/2. */
 	margin-inline: calc((100% - 2 * var(--gap) - 3 * var(--icon)) / 6);
-	/* A widget's bottom edge sits flush on its row's grid line, but an app
-	   icon's bottom edge doesn't — there's a label below it (icon's own
-	   flex-gap of 7px, then the label line) before that row's true grid
-	   line. Without this, the widget looks closer to the row below it than
-	   two icon rows look to each other. 1.32 approximates this browser's
-	   line-height/font-size ratio for .app-label — matched by measurement,
-	   not exact font metrics, but within a sub-pixel in testing. */
-	margin-bottom: calc(7px + 1.32 * clamp(0.74rem, 0.95vw, 0.95rem));
 	border-radius: clamp(26px, 2.6vw, 38px);
 	padding: clamp(18px, 2.2vw, 34px);
 	overflow: hidden;
@@ -557,9 +566,12 @@ button {
    ---------------------------------------------------------------- */
 
 @media (max-width: 767px) {
-	.widget {
+	.widget-slot {
 		grid-column: span 5;
 		grid-row: span 1;
+	}
+
+	.widget {
 		/* k=5 here (this tier's widget spans all 5 columns) */
 		margin-inline: calc((100% - 4 * var(--gap) - 5 * var(--icon)) / 10);
 		padding: 12px 14px;
@@ -612,8 +624,9 @@ button {
 		--gap: 10px;
 	}
 
+	.widget-slot { grid-column: span 4; }
+
 	.widget {
-		grid-column: span 4;
 		/* k=4 here (this tier's widget spans all 4 columns) */
 		margin-inline: calc((100% - 3 * var(--gap) - 4 * var(--icon)) / 8);
 	}
