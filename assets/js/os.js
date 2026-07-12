@@ -194,6 +194,15 @@ function renderSkillWidget() {
 	return w;
 }
 
+// 위젯도 결국 "칸을 여러 개 차지하는 큰 앱" 취급 — 앱과 똑같이 밑에 이름표를 단다.
+// 그래야 위젯이 몇 개든, 어디로 옮기든 정렬/간격 규칙을 따로 신경 쓸 필요가 없다.
+function wrapAsWidgetApp(label, widgetEl) {
+	const wrapper = el("div", "app widget-slot");
+	wrapper.appendChild(widgetEl);
+	wrapper.appendChild(el("span", "app-label", label));
+	return wrapper;
+}
+
 /* ---------------- 앱 아이콘 ---------------- */
 
 function buildIconFace(app) {
@@ -372,8 +381,8 @@ function tickClock() {
 
 /* ---------------- 초기화 ---------------- */
 
-home.appendChild(renderAboutWidget());
-home.appendChild(renderSkillWidget());
+home.appendChild(wrapAsWidgetApp("About", renderAboutWidget()));
+home.appendChild(wrapAsWidgetApp("Skill", renderSkillWidget()));
 APPS.forEach((app) => home.appendChild(renderApp(app)));
 
 tickClock();
