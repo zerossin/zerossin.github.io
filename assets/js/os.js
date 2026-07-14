@@ -62,6 +62,7 @@ const FOLDERS = {
 		items: [
 			{ href: "https://github.com/zerossin/guminai", img: "assets/images/guminai.png", title: "GuminAI" },
 			{ href: "https://github.com/zerossin/database-project", img: "assets/images/database-project.jpeg", title: "Database Project" },
+			{ href: "https://discord.com/oauth2/authorize?client_id=1253774303527436359", img: "assets/images/logo-vandi-bot.jpg", title: "Vandi bot" },
 		],
 	},
 	game: {
