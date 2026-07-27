@@ -334,6 +334,7 @@ button {
 	font-size: clamp(1.25rem, 2vw, 1.9rem);
 	font-weight: 800;
 	letter-spacing: -0.01em;
+	color: #1d1d1f;
 }
 
 .about-intro {
@@ -479,13 +480,21 @@ button {
 .app-label {
 	font-size: clamp(0.74rem, 0.95vw, 0.95rem);
 	font-weight: 600;
-	color: rgba(255, 255, 255, 0.9);
-	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+	color: #1d1d1f;
 	text-align: center;
 	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+/* Home-screen icons sit directly on the dark night sky, so their
+   labels need light text — but this same .app-label class is reused
+   inside folder windows (.win-app-grid), which are light cards, so
+   that context keeps the dark default above instead. */
+.home-grid .app-label {
+	color: rgba(255, 255, 255, 0.9);
+	text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 /* ----------------------------------------------------------------
@@ -612,6 +621,7 @@ button {
 	max-height: min(80vh, 820px);
 	display: flex;
 	flex-direction: column;
+	color: #1d1d1f;
 	border-radius: clamp(22px, 1.6vw, 30px);
 	background: linear-gradient(160deg, rgba(255, 255, 255, 0.92), rgba(250, 250, 252, 0.85));
 	-webkit-backdrop-filter: blur(24px) saturate(1.6);
@@ -691,7 +701,45 @@ button {
 	aspect-ratio: 1;
 	object-fit: cover;
 	border-radius: 12px;
+	cursor: zoom-in;
+	transition: transform 0.15s ease;
 }
+
+.win-gallery img:hover { transform: scale(1.03); }
+
+/* Lightbox — click a gallery photo to see it full-size. Sits above
+   the folder/gallery modal, so it needs a higher z-index than
+   .os-modal. */
+
+.img-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 200;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgba(6, 8, 20, 0.85);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	opacity: 0;
+	cursor: zoom-out;
+	transition: opacity 0.2s ease;
+}
+
+.img-lightbox.open { opacity: 1; }
+
+.img-lightbox img {
+	max-width: 90vw;
+	max-height: 90vh;
+	object-fit: contain;
+	border-radius: 12px;
+	box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+	transform: scale(0.94);
+	transition: transform 0.2s ease;
+}
+
+.img-lightbox.open img { transform: scale(1); }
 
 /* History window */
 

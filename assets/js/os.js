@@ -122,6 +122,8 @@ const MINECRAFT_GALLERY = [
 	"시작동북해동(압축).png",
 	"정부청사단지.png",
 	"청와당.png",
+	"동대문.jpg",
+	"수민국 섬.png",
 ].map((name) => encodeURI("assets/images/minecraft/" + name));
 
 /* ---------------- 아이콘 (인라인 SVG) ---------------- */
@@ -444,6 +446,40 @@ function openWindow(title, body, originEl, subtitle) {
 	backdrop.addEventListener("click", close);
 	document.addEventListener("keydown", onKey);
 }
+
+/* ---------------- 갤러리 사진 확대 보기 (마인크래프트/Gallery 창) ----------------
+   거창한 감상 모드가 아니라, 사진을 눌렀을 때 화면 가득 크게 보여주고
+   다시 누르거나 Esc로 닫히는 정도의 아주 단순한 라이트박스. */
+
+function openLightbox(src) {
+	const box = el("div", "img-lightbox");
+	const img = document.createElement("img");
+	img.src = src;
+	img.alt = "";
+	box.appendChild(img);
+	document.body.appendChild(box);
+
+	requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add("open")));
+
+	const close = () => {
+		box.classList.remove("open");
+		document.removeEventListener("keydown", onKey);
+		setTimeout(() => box.remove(), 220);
+	};
+	const onKey = (e) => {
+		if (e.key !== "Escape") return;
+		e.stopImmediatePropagation(); // 사진만 닫고, 뒤에 열려 있는 폴더 창은 그대로 둔다
+		close();
+	};
+
+	box.addEventListener("click", close);
+	document.addEventListener("keydown", onKey);
+}
+
+document.addEventListener("click", (e) => {
+	const img = e.target.closest(".win-gallery img");
+	if (img) openLightbox(img.src);
+});
 
 /* ---------------- 시계 ---------------- */
 
