@@ -1,0 +1,10 @@
+# OS & IDE
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Large media files — stored on NAS instead
+assets/images/minecraft/
+assets/images/pic*.jpg
