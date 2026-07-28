@@ -5,6 +5,16 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="description" content="Zerossin — Personal Operating System" />
+		<script>
+			// 잠금화면을 이미 본 적 있으면(localStorage), 홈 화면이 잠깐이라도
+			// 보였다가 잠금화면에 덮이는 깜빡임이 없도록 CSS 적용 전에 미리
+			// html에 표시해둔다. head에서 동기적으로 실행되므로 첫 페인트 전에 끝남.
+			try {
+				if (localStorage.getItem("zerossin-lock-seen")) {
+					document.documentElement.classList.add("no-lock");
+				}
+			} catch (e) {}
+		</script>
 		<link rel="stylesheet" href="assets/css/os.css" />
 
 		<link rel="shortcut icon" href="favicon.ico">
@@ -39,7 +49,20 @@
 		<div id="os">
 			<header class="os-statusbar">
 				<span class="os-name">Zerossin</span>
-				<span class="os-clock" id="os-clock"></span>
+				<div class="os-statusbar-right">
+					<button class="cc-trigger" id="cc-trigger" aria-label="제어센터 열기" type="button">
+						<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+							<mask id="cc-trigger-mask">
+								<rect x="0" y="0" width="24" height="24" fill="#fff" />
+								<circle cx="17" cy="17.5" r="3" fill="#000" />
+							</mask>
+							<rect x="2" y="3" width="20" height="7" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6" />
+							<circle cx="8" cy="6.5" r="2.6" fill="currentColor" />
+							<rect x="2" y="14" width="20" height="7" rx="3.5" fill="currentColor" mask="url(#cc-trigger-mask)" />
+						</svg>
+					</button>
+					<span class="os-clock" id="os-clock"></span>
+				</div>
 			</header>
 
 			<main class="home-grid" id="home">
@@ -54,6 +77,30 @@
 			<footer class="os-footer">
 				<p>&copy; Zerossin &middot; <a href="https://github.com/zerossin" target="_blank" rel="noreferrer">GitHub</a></p>
 			</footer>
+		</div>
+
+		<div id="lockscreen" class="lockscreen">
+			<div class="lock-time" id="lock-time"></div>
+			<div class="lock-date" id="lock-date"></div>
+			<div class="lock-hint"><span class="lock-hint-chevron"></span>탭하여 잠금 해제</div>
+		</div>
+
+		<div class="cc-backdrop" id="cc-backdrop"></div>
+		<div class="cc-panel" id="cc-panel">
+			<button class="cc-circle" id="cc-toggle-motion" type="button" role="switch" aria-checked="false" aria-label="애니메이션 토글">
+				<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+					<circle cx="17" cy="12" r="3" fill="currentColor" />
+					<path class="cc-icon-motion-trail" d="M3 12h11" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+					<path class="cc-icon-motion-trail" d="M6 7.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.65" />
+					<path class="cc-icon-motion-trail" d="M6 16.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity="0.65" />
+				</svg>
+			</button>
+			<button class="cc-circle" id="cc-action-lock" type="button" aria-label="잠금화면 다시 보기">
+				<svg viewBox="0 0 24 24" width="34" height="34" aria-hidden="true">
+					<circle cx="12" cy="13" r="7" fill="none" stroke="currentColor" stroke-width="1.8" />
+					<line x1="12" y1="3" x2="12" y2="11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+				</svg>
+			</button>
 		</div>
 
 		<script src="assets/js/os.js"></script>

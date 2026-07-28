@@ -555,6 +555,136 @@ function tickClock() {
 	clock.textContent = `${hh}:${mm}`;
 }
 
+/* ---------------- 잠금화면 ----------------
+   평생 1번만 뜨는 게 기본(localStorage에 기록). 다만 나중에 제어센터에
+   "잠금" 버튼 같은 걸 추가하면, 기록과 상관없이 showLockScreen()을
+   호출해서 언제든 다시 띄울 수 있게 분리해뒀다. */
+
+const LOCK_KEY = "zerossin-lock-seen";
+
+function tickLockClock() {
+	const timeEl = document.getElementById("lock-time");
+	const dateEl = document.getElementById("lock-date");
+	if (!timeEl || !dateEl) return;
+	const now = new Date();
+	const hh = String(now.getHours()).padStart(2, "0");
+	const mm = String(now.getMinutes()).padStart(2, "0");
+	timeEl.textContent = `${hh}:${mm}`;
+	const days = ["일", "월", "화", "수", "목", "금", "토"];
+	dateEl.textContent = `${now.getMonth() + 1}월 ${now.getDate()}일 ${days[now.getDay()]}요일`;
+}
+
+// 잠금 중엔 #os(아이콘 그리드)를 숨겨서, 잠금화면의 반투명 배경 너머로
+// 아이콘이 비쳐 보이지 않게 한다 — 뒤에 실제로 남는 건 .sky(밤하늘) 뿐이라
+// "잠금화면 = 배경화면 위에 시계"라는 느낌이 그대로 유지된다.
+function setHomeHidden(hidden) {
+	const os = document.getElementById("os");
+	if (os) os.style.visibility = hidden ? "hidden" : "";
+	document.body.style.overflow = hidden ? "hidden" : "";
+}
+
+function unlock() {
+	const el = document.getElementById("lockscreen");
+	if (!el || el.classList.contains("unlocking")) return;
+	try {
+		localStorage.setItem(LOCK_KEY, "1");
+	} catch (e) {
+		// 시크릿 모드 등으로 저장이 막혀 있어도 이번 열람 자체는 그냥 해제됨
+	}
+	el.classList.add("unlocking");
+	setHomeHidden(false);
+	el.addEventListener("transitionend", () => el.remove(), { once: true });
+}
+
+// 제어센터 등에서 언제든 다시 불러올 수 있게 만든 진입점 — localStorage에
+// "본 적 있음"이 있어도 무시하고 강제로 잠금화면을 새로 띄운다.
+function showLockScreen() {
+	// head 스크립트가 "이미 본 방문자"에게 첫 페인트 전 깜빡임을 막으려고
+	// 달아둔 클래스 — CSS가 .lockscreen을 통째로 display:none 시켜버리니,
+	// 강제로 다시 띄울 때는 반드시 떼어내야 한다.
+	document.documentElement.classList.remove("no-lock");
+	let el = document.getElementById("lockscreen");
+	if (!el) {
+		el = document.createElement("div");
+		el.id = "lockscreen";
+		el.className = "lockscreen";
+		el.innerHTML = `
+			<div class="lock-time" id="lock-time"></div>
+			<div class="lock-date" id="lock-date"></div>
+			<div class="lock-hint"><span class="lock-hint-chevron"></span>탭하여 잠금 해제</div>
+		`;
+		document.body.appendChild(el);
+	}
+	el.classList.remove("unlocking");
+	tickLockClock();
+	setHomeHidden(true);
+	el.addEventListener("click", unlock, { once: true });
+}
+
+(function initLockScreen() {
+	const el = document.getElementById("lockscreen");
+	if (document.documentElement.classList.contains("no-lock")) {
+		if (el) el.remove(); // 이미 본 방문자 — DOM에서 아예 치워서 불필요한 타이머 없앰
+		return;
+	}
+	if (!el) return;
+	tickLockClock();
+	setInterval(tickLockClock, 15000);
+	setHomeHidden(true);
+	el.addEventListener("click", unlock, { once: true });
+})();
+
+/* ---------------- 제어센터 ---------------- */
+
+const MOTION_KEY = "zerossin-reduce-motion";
+
+function setReduceMotion(on) {
+	document.documentElement.classList.toggle("reduce-motion-forced", on);
+	const toggle = document.getElementById("cc-toggle-motion");
+	if (toggle) toggle.setAttribute("aria-checked", String(on));
+	try {
+		localStorage.setItem(MOTION_KEY, on ? "1" : "0");
+	} catch (e) {
+		// 저장이 막혀 있어도 이번 방문 동안은 그냥 꺼진 채로 유지됨
+	}
+}
+
+function openControlCenter() {
+	document.getElementById("cc-backdrop").classList.add("open");
+	document.getElementById("cc-panel").classList.add("open");
+}
+
+function closeControlCenter() {
+	document.getElementById("cc-backdrop").classList.remove("open");
+	document.getElementById("cc-panel").classList.remove("open");
+}
+
+(function initControlCenter() {
+	const trigger = document.getElementById("cc-trigger");
+	const backdrop = document.getElementById("cc-backdrop");
+	const motionToggle = document.getElementById("cc-toggle-motion");
+	const lockAction = document.getElementById("cc-action-lock");
+	if (!trigger) return;
+
+	let savedMotion = false;
+	try {
+		savedMotion = localStorage.getItem(MOTION_KEY) === "1";
+	} catch (e) {
+		savedMotion = false;
+	}
+	setReduceMotion(savedMotion);
+
+	trigger.addEventListener("click", openControlCenter);
+	backdrop.addEventListener("click", closeControlCenter);
+	motionToggle.addEventListener("click", () => {
+		setReduceMotion(motionToggle.getAttribute("aria-checked") !== "true");
+	});
+	lockAction.addEventListener("click", () => {
+		closeControlCenter();
+		showLockScreen();
+	});
+})();
+
 /* ---------------- 아이콘 재배치 순서 저장 ----------------
    서버가 없으니 "재배치"는 어차피 방문자 각자의 브라우저 안에서만 의미가
    있다 — 이 사이트의 실제 기본 순서(다른 방문자가 보는 것)는 절대 안

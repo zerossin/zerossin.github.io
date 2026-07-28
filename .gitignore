@@ -16,3 +16,6 @@ node_modules/
 # Build
 dist/
 build/
+
+# Photos kept out of git history (copied directly to NAS instead)
+assets/images/minecraft/

@@ -35,13 +35,19 @@ a { color: inherit; }
 /* ----------------------------------------------------------------
    Night sky — pure CSS stand-in for a photo background: scales to
    any viewport with no image download, so it stays cheap on mobile.
-   Fixed behind the home screen (DOM order puts #os on top; no
-   z-index needed since both are auto-stacked in that order).
+   position:fixed always opens its own stacking context (unlike
+   relative/absolute, which only do with an explicit z-index) — so
+   without a z-index here, this paints ABOVE #os's plain static
+   content regardless of DOM order, and once the page scrolls past
+   one viewport, the opaque hills silhouette covers app labels that
+   scroll into that band. Negative z-index pins it behind all normal
+   in-flow content instead.
    ---------------------------------------------------------------- */
 
 .sky {
 	position: fixed;
 	inset: 0;
+	z-index: -1;
 	overflow: hidden;
 	pointer-events: none;
 }
@@ -205,6 +211,245 @@ button {
 	cursor: pointer;
 	font-weight: 800;
 	color: #6cb0ff;
+}
+
+.os-statusbar-right {
+	display: flex;
+	align-items: center;
+	gap: clamp(10px, 1.5vw, 18px);
+}
+
+/* ----------------------------------------------------------------
+   제어센터 — 우측 상단 정사각 버튼(맥 메뉴바 제어센터 아이콘과 같은
+   "토글 두 개" 모양)을 누르면 그 아래로 패널이 곧장 내려온다. 패널
+   안은 라벨 달린 박스 목록이 아니라, 리퀴드 글래스 원형 버튼 두 개
+   — 항목이 늘어나도 "네모난 설정 목록"이 아니라 이 원형 그리드를
+   넓히는 쪽으로 확장하는 걸 전제로 한다.
+   ---------------------------------------------------------------- */
+
+.cc-trigger {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	border-radius: 9px;
+	background: rgba(255, 255, 255, 0.16);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+	color: rgba(255, 255, 255, 0.92);
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.cc-trigger:hover {
+	background: rgba(255, 255, 255, 0.24);
+}
+
+.cc-trigger:active {
+	transform: scale(0.9);
+}
+
+.cc-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 400;
+	background: rgba(0, 0, 0, 0.3);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+}
+
+.cc-backdrop.open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.cc-panel {
+	position: fixed;
+	top: clamp(58px, 8vh, 90px);
+	right: clamp(16px, 3vw, 48px);
+	z-index: 401;
+	display: flex;
+	gap: 16px;
+	padding: 18px;
+	border-radius: 28px;
+	background: rgba(28, 26, 46, 0.55);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12) inset, 0 20px 50px rgba(0, 0, 0, 0.45);
+	-webkit-backdrop-filter: blur(24px);
+	backdrop-filter: blur(24px);
+	/* 스케일이 아니라 순수 수직 이동 — "패널이 그 자리에서 커진다"가
+	   아니라 "위에서 아래로 미끄러져 내려온다"는 요청에 맞춘 것. */
+	transform: translateY(-24px);
+	opacity: 0;
+	pointer-events: none;
+	transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.cc-panel.open {
+	transform: translateY(0);
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.cc-circle {
+	position: relative;
+	width: 64px;
+	height: 64px;
+	flex: none;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+	color: rgba(255, 255, 255, 0.92);
+	/* 리퀴드 글래스: 배경은 흰색 하나를 그대로 두고 알파(투명도)만
+	   움직인다 — 그라디언트 자체를 바꾸면 브라우저가 두 그라디언트 사이를
+	   보간하지 못해 뚝 끊기지만, 같은 색의 알파 변화는 매끄럽게 전환된다.
+	   위쪽 광택(::before)은 켜짐/꺼짐과 무관하게 항상 고정으로 얹혀서
+	   "유리" 질감 자체는 상태와 상관없이 유지된다. */
+	background-color: rgba(255, 255, 255, 0.16);
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.28) inset,
+		0 8px 20px rgba(0, 0, 0, 0.25);
+	-webkit-backdrop-filter: blur(14px) saturate(1.4);
+	backdrop-filter: blur(14px) saturate(1.4);
+	transition: transform 0.15s ease, background-color 0.4s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cc-circle::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(160deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 55%);
+	pointer-events: none;
+}
+
+.cc-circle svg {
+	position: relative;
+}
+
+.cc-circle:hover {
+	transform: scale(1.06);
+}
+
+.cc-circle:active {
+	transform: scale(0.92);
+}
+
+.cc-circle[aria-checked="true"] {
+	background-color: #ffffff;
+	color: #8b5cf6;
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+		0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 애니메이션 아이콘의 "궤적"만 상태에 따라 점 쪽으로 사그라들며
+   사라진다 — 켜짐(모션 감소)일 때 트레일이 없는 정지된 점만 남아
+   아이콘 스스로가 "지금 안 움직인다"를 보여준다. */
+.cc-icon-motion-trail {
+	transform-origin: right center;
+	transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cc-circle[aria-checked="true"] .cc-icon-motion-trail {
+	opacity: 0;
+	transform: scaleX(0.25);
+}
+
+/* "애니메이션 끄기"가 켜지면 장식적 애니메이션이든 기능적 전환이든
+   전부 죽인다 — 부분적으로만 끄면 "껐는데 왜 이건 움직이지" 하는
+   혼란이 생기니, 이 토글의 의미 자체를 "전부"로 단순하게 유지한다. */
+html.reduce-motion-forced * {
+	animation: none !important;
+	transition: none !important;
+}
+
+/* ----------------------------------------------------------------
+   잠금화면 — 배경은 이미 있는 .sky를 그대로 재사용(별도 이미지 없음),
+   그 위에 시계/날짜/안내문구만 얹는다. 방문자별 localStorage에 "본 적
+   있음"이 기록되면 다음부터는 index.html의 head 스크립트가 첫 페인트
+   전에 no-lock 클래스를 달아서 아예 안 보이게 한다.
+   ---------------------------------------------------------------- */
+
+.lockscreen {
+	position: fixed;
+	inset: 0;
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	padding-top: clamp(72px, 20vh, 200px);
+	background: linear-gradient(180deg, rgba(6, 8, 20, 0.35) 0%, rgba(6, 8, 20, 0.15) 45%, rgba(6, 8, 20, 0.55) 100%);
+	cursor: pointer;
+	transition: transform 0.45s cubic-bezier(0.3, 0, 0.2, 1), opacity 0.45s ease;
+}
+
+html.no-lock .lockscreen {
+	display: none;
+}
+
+.lockscreen.unlocking {
+	transform: translateY(-100%);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.lock-time {
+	font-size: clamp(3.2rem, 12vw, 6rem);
+	font-weight: 300;
+	letter-spacing: 0.02em;
+	text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.lock-date {
+	font-size: clamp(1rem, 2.4vw, 1.3rem);
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.75);
+	margin-top: 6px;
+}
+
+.lock-hint {
+	position: absolute;
+	bottom: clamp(48px, 10vh, 96px);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 10px 22px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.14);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset, 0 6px 24px rgba(0, 0, 0, 0.25);
+	backdrop-filter: blur(8px);
+	font-size: clamp(0.95rem, 2vw, 1.05rem);
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.95);
+	letter-spacing: 0.03em;
+	text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+	animation: lock-hint-pulse 1.8s ease-in-out infinite;
+}
+
+.lock-hint-chevron {
+	width: 10px;
+	height: 10px;
+	border-top: 2px solid rgba(255, 255, 255, 0.95);
+	border-right: 2px solid rgba(255, 255, 255, 0.95);
+	transform: rotate(-45deg);
+	animation: lock-chevron-bounce 1.8s ease-in-out infinite;
+}
+
+@keyframes lock-chevron-bounce {
+	0%, 100% { transform: rotate(-45deg) translate(0, 0); }
+	50% { transform: rotate(-45deg) translate(2px, -2px); }
+}
+
+@keyframes lock-hint-pulse {
+	0%, 100% { opacity: 0.75; transform: translateY(0) scale(1); }
+	50% { opacity: 1; transform: translateY(-3px) scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.lock-hint { animation: none; opacity: 0.7; }
 }
 
 /* ----------------------------------------------------------------
@@ -449,11 +694,35 @@ button {
 	align-items: center;
 	justify-content: center;
 	background: linear-gradient(150deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.55));
-	border: 1px solid rgba(255, 255, 255, 0.8);
+	/* 테두리는 ::after가 그린다 — border 자체는 두께만 맞춰두는 투명
+	   자리표시자. 폴더 아이콘처럼 이 background를 통째로 덮어써도
+	   테두리는 별도 레이어라 안 깨진다. */
+	border: 1px solid transparent;
 	box-shadow:
 		0 8px 18px rgba(29, 29, 31, 0.1),
 		inset 0 1px 0 rgba(255, 255, 255, 0.85);
 	transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+/* 테두리를 사방 전부 밝게 두면 두꺼워 보이니, 평소엔 아주 얇고 옅게 —
+   빛이 왼쪽 위에서 들어와 오른쪽 아래로 살짝 반사되는 느낌만 두 모서리
+   부근에 밝게 줘서 입체감을 낸다. mask로 링 모양만 남기는 표준 기법이라
+   .app-icon 자신의 background(폴더 등에서 덮어쓰는 것 포함)와 무관하다. */
+.app-icon::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 1px;
+	background: linear-gradient(135deg,
+		rgba(255, 255, 255, 0.95) 0%,
+		rgba(255, 255, 255, 0.1) 25%,
+		rgba(255, 255, 255, 0.1) 75%,
+		rgba(255, 255, 255, 0.95) 100%);
+	-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	pointer-events: none;
 }
 
 .app-icon svg {
