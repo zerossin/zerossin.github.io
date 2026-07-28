@@ -583,6 +583,60 @@ function setHomeHidden(hidden) {
 	document.body.style.overflow = hidden ? "hidden" : "";
 }
 
+function motionEnabled() {
+	return (
+		!document.documentElement.classList.contains("reduce-motion-forced") &&
+		!window.matchMedia("(prefers-reduced-motion: reduce)").matches
+	);
+}
+
+// 잠금 해제 순간, 아이콘들이 화면 중심에서 자기 자리로 뻗은 방사선을 따라
+// 바깥에서 안으로 모여든다 — 재배치 드래그의 FLIP과 같은 원리(시작 위치를
+// 즉시 적용 → 한 프레임 뒤에 transition과 함께 최종 위치로)이지만, 여기는
+// "이전 위치"가 실제로 없으니 각 아이콘의 (중심→자기자리) 방향을 그대로
+// 연장해서 가상의 시작점을 만든다는 점만 다르다. 기준점은 grid가 아니라
+// "화면"(뷰포트) 중심 — 중심·자기자리·가상 시작점이 항상 일직선이 되도록.
+// 크기도 그 선을 따라 원근감 있게: 더 멀리서 날아오는(=더 많이 움직이는)
+// 아이콘일수록 시작 크기가 크고, 그 비례식은 모든 아이콘에 동일하게 적용.
+function playHomeConverge() {
+	if (!motionEnabled()) return false;
+	const nodes = getReorderableNodes();
+	if (!nodes.length) return false;
+
+	const cx = window.innerWidth / 2;
+	const cy = window.innerHeight / 2;
+	const RADIAL_FACTOR = 0.6; // 중심에서 멀리 있던 아이콘일수록 더 먼 곳에서 날아옴
+	const MIN_EXTRA = 36; // 중심 근처 아이콘도 최소한 이만큼은 움직여 보이게
+	const SCALE_PER_PX = 0.0028; // 이동 거리 1px당 시작 크기가 이만큼씩 커짐 — 전 아이콘 공통
+	const MAX_SCALE = 2.4; // 화면 아주 구석 아이콘이 말도 안 되게 커지는 것만 막는 안전장치
+
+	const starts = nodes.map((node) => {
+		const rect = node.getBoundingClientRect();
+		const dx = rect.left + rect.width / 2 - cx;
+		const dy = rect.top + rect.height / 2 - cy;
+		const dist = Math.hypot(dx, dy) || 1;
+		const extra = dist * RADIAL_FACTOR + MIN_EXTRA;
+		const scale = Math.min(1 + extra * SCALE_PER_PX, MAX_SCALE);
+		return { node, x: (dx / dist) * extra, y: (dy / dist) * extra, scale };
+	});
+
+	starts.forEach(({ node, x, y, scale }) => {
+		node.style.transition = "none";
+		node.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+		node.style.opacity = "0";
+	});
+
+	requestAnimationFrame(() => {
+		starts.forEach(({ node }) => {
+			node.style.transition = "transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease";
+			node.style.transform = "";
+			node.style.opacity = "";
+			node.addEventListener("transitionend", () => { node.style.transition = ""; }, { once: true });
+		});
+	});
+	return true;
+}
+
 function unlock() {
 	const el = document.getElementById("lockscreen");
 	if (!el || el.classList.contains("unlocking")) return;
@@ -592,7 +646,14 @@ function unlock() {
 		// 시크릿 모드 등으로 저장이 막혀 있어도 이번 열람 자체는 그냥 해제됨
 	}
 	el.classList.add("unlocking");
-	setHomeHidden(false);
+	// 확대된 채로 화면 중심에서 날아오는 동안 아이콘이 잠깐 뷰포트 밖으로
+	// 삐져나가는데, 이때 스크롤을 열어두면 그 삐져나온 부분 때문에
+	// 스크롤바가 생겼다가 다 정착하면 다시 사라지면서 레이아웃이
+	// 덜걱거린다. 애니메이션이 끝나 모두 원래 크기/자리로 돌아올 때까지는
+	// overflow:hidden을 유지해서 스크롤바 자체가 뜨지 않게 막는다.
+	document.getElementById("os").style.visibility = "";
+	const played = playHomeConverge();
+	setTimeout(() => { document.body.style.overflow = ""; }, played ? 650 : 0);
 	el.addEventListener("transitionend", () => el.remove(), { once: true });
 }
 
@@ -611,7 +672,7 @@ function showLockScreen() {
 		el.innerHTML = `
 			<div class="lock-time" id="lock-time"></div>
 			<div class="lock-date" id="lock-date"></div>
-			<div class="lock-hint"><span class="lock-hint-chevron"></span>탭하여 잠금 해제</div>
+			<div class="lock-hint">탭하여 잠금 해제</div>
 		`;
 		document.body.appendChild(el);
 	}
