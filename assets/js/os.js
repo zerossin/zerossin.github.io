@@ -6,7 +6,7 @@
 
 const SITE = {
 	name: "Zerossin",
-	intro: "경희대학교 재학 중.\n이것저것 만들며 배우고 있습니다.",
+	intro: "경희대학교 졸업.\n이것저것 만들며 배우고 있습니다.",
 	github: "https://github.com/zerossin",
 	email: "zerossin.dev@gmail.com",
 	blog: "#",       // Tistory 링크가 생기면 채우기
@@ -42,6 +42,7 @@ const FOLDERS = {
 		label: "Project",
 		desc: "협업 프로젝트",
 		items: [
+			{ href: "https://github.com/softeerbootcamp-8th/DE_team2-GangnamguUmBokDong", img: "assets/images/logo-ddareungi-dashboard.png", title: "따릉이 대시보드" },
 			{ href: "https://github.com/zerossin/Disa-Project", img: "assets/images/logo_disa_project.png", title: "DISA Project" },
 			{ href: "https://github.com/VRTempleStay/VR-TempleStay", letter: "VR", color: "#4d8fe2", title: "VR-TempleStay" },
 		],
@@ -90,12 +91,12 @@ const FOLDERS = {
 /* ---------------- 연혁 ---------------- */
 
 const HISTORY = [
-	{ when: "2020.03 ~", what: "경희대학교 재학" },
+	{ when: "2020.03 ~ 2026.08", what: "경희대학교 졸업" },
 	{ when: "2021.09 ~ 2023.06", what: "공군 개발지원병" },
 	{ when: "2023.12", what: "KSC 2023 참가 (한국소프트웨어종합학술대회)" },
 	{ when: "2024.02", what: "개인 웹사이트 제작" },
 	{ when: "2025.07", what: "KCC 2025 참가 (한국컴퓨터종합학술대회)" },
-	{ when: "2026.07 ~ 2026.08", what: "현대자동차그룹 소프티어 8기 데이터 아키텍처/엔지니어링 과정 수료 (진행중)" },
+	{ when: "2026.07 ~ 2026.08", what: "현대자동차그룹 소프티어 8기 데이터 아키텍처/엔지니어링 과정 수료" },
 ];
 
 /* ---------------- 갤러리 ---------------- */
@@ -221,6 +222,7 @@ const APPS = [
 	{ id: "lab", label: "Lab", type: "folder", folder: "lab" },
 	{ id: "game", label: "Game", type: "folder", folder: "game" },
 	{ id: "etc", label: "ETC", type: "folder", folder: "etc" },
+	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg" },
 	{ id: "minecraft", label: "Minecraft", type: "window", img: "assets/images/logo_mc_map.png" },
 	{ id: "gallery", label: "Gallery", type: "window", icon: ICONS.gallery, bg: "#ffffff" },
 	{ id: "canvas", label: "Canvas", type: "window", icon: ICONS.canvas, bg: "#fdf6ec" },

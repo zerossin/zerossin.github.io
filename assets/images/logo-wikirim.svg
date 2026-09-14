@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-4 -14 128 128" role="img" aria-labelledby="wikirim-mark-title wikirim-mark-description">
+  <title id="wikirim-mark-title">위키림</title>
+  <desc id="wikirim-mark-description">겹괄호 안에 두 나무와 열린 길을 담은 위키림 심볼</desc>
+  <g fill="#176b55">
+    <path d="M0 0h25v12H14v76h11v12H0z" />
+    <path d="M38 0h14v100H35z" />
+    <path d="m25.5 23 12.5 12-.5 13-12-12.5z" />
+    <path d="M82 0H68v100h17z" />
+    <path d="m94.5 23-12.5 12 .5 13 12-12.5z" />
+    <path d="M120 0H95v12h11v76H95v12h25z" />
+  </g>
+</svg>
