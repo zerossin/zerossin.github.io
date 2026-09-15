@@ -223,7 +223,7 @@ const APPS = [
 	{ id: "lab", label: "Lab", type: "folder", folder: "lab" },
 	{ id: "game", label: "Game", type: "folder", folder: "game" },
 	{ id: "etc", label: "ETC", type: "folder", folder: "etc" },
-	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg" },
+	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg", iconScale: 0.62 },
 	{ id: "minecraft", label: "Minecraft", type: "window", img: "assets/images/logo_mc_map.png" },
 	{ id: "gallery", label: "Gallery", type: "window", icon: ICONS.gallery, bg: "#ffffff" },
 	{ id: "canvas", label: "Canvas", type: "window", icon: ICONS.canvas, bg: "#fdf6ec" },
@@ -306,6 +306,7 @@ function buildIconFace(app) {
 		img.loading = "lazy";
 		img.draggable = false; // <img>는 기본이 draggable="true"라 커스텀 재배치 드래그와 충돌함
 		if (app.iconObjectPosition) img.style.objectPosition = app.iconObjectPosition;
+		if (app.iconScale) img.style.transform = `scale(${app.iconScale})`;
 		face.appendChild(img);
 	} else if (app.icon) {
 		face.innerHTML = app.icon;
