@@ -211,7 +211,7 @@ const APPS = [
 	{ id: "project", label: "Project", type: "folder", folder: "project" },
 	{ id: "tool", label: "Tool", type: "folder", folder: "tool" },
 	{ id: "lab", label: "Lab", type: "folder", folder: "lab" },
-	{ id: "game", label: "Games", type: "link", href: "https://game.zerossin.com/", img: "assets/images/games-joystick.webp", iconTint: "#ef4139" },
+	{ id: "game", label: "Games", type: "link", href: "https://game.zerossin.com/games", img: "assets/images/games-joystick.webp", iconTint: "#ef4139" },
 	{ id: "etc", label: "ETC", type: "folder", folder: "etc" },
 	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg", iconScale: 0.62, iconTint: "#b6c8b8" },
 	{ id: "minecraft", label: "Minecraft", type: "window", img: "assets/images/logo_mc_map.png", iconTint: "#7c946b" },
