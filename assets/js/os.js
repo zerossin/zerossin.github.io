@@ -206,15 +206,15 @@ const ICONS = {
 const APPS = [
 	{ id: "github", label: "GitHub", type: "link", href: SITE.github, icon: ICONS.github, bg: "#24292f" },
 	{ id: "tistory", label: "Tistory", type: "link", href: SITE.blog, icon: ICONS.tistory, bg: "#eb5310" },
-	{ id: "instagram", label: "Insta", type: "link", href: SITE.instagram, icon: ICONS.instagram, bg: "radial-gradient(circle at 30% 110%, #fdc468 0%, #df4996 45%, #9146c8 80%)" },
+	{ id: "instagram", label: "Insta", type: "link", href: SITE.instagram, icon: ICONS.instagram, bg: "radial-gradient(circle at 30% 110%, #fdc468 0%, #df4996 45%, #9146c8 80%)", iconTint: "#df4996" },
 	{ id: "research", label: "Research", type: "folder", folder: "research" },
 	{ id: "project", label: "Project", type: "folder", folder: "project" },
 	{ id: "tool", label: "Tool", type: "folder", folder: "tool" },
 	{ id: "lab", label: "Lab", type: "folder", folder: "lab" },
-	{ id: "game", label: "Games", type: "link", href: "https://game.zerossin.com/", img: "assets/images/logo-games.png" },
+	{ id: "game", label: "Games", type: "link", href: "https://game.zerossin.com/", img: "assets/images/games-joystick.webp", iconTint: "#ef4139" },
 	{ id: "etc", label: "ETC", type: "folder", folder: "etc" },
-	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg", iconScale: 0.62 },
-	{ id: "minecraft", label: "Minecraft", type: "window", img: "assets/images/logo_mc_map.png" },
+	{ id: "wikirim", label: "Wikirim", type: "link", href: "https://wikirim.com/", img: "assets/images/logo-wikirim.svg", iconScale: 0.62, iconTint: "#b6c8b8" },
+	{ id: "minecraft", label: "Minecraft", type: "window", img: "assets/images/logo_mc_map.png", iconTint: "#7c946b" },
 	{ id: "gallery", label: "Gallery", type: "window", icon: ICONS.gallery, bg: "#ffffff" },
 	{ id: "canvas", label: "Canvas", type: "window", icon: ICONS.canvas, bg: "#fdf6ec" },
 	{ id: "history", label: "History", type: "window", icon: ICONS.history, bg: "#eef1f5" },
@@ -223,7 +223,7 @@ const APPS = [
 	// 아이콘은 미리 뽑아둔 정지 프레임(진짜 PNG 파일)을 쓴다 — 처음엔 <canvas>로
 	// gif 첫 프레임을 캡처해서 바꿔치기했는데, file://로 그냥 열면 캔버스가
 	// "오염(tainted)" 처리되어 toDataURL이 조용히 실패해 계속 움직여 보였음.
-	{ id: "cat", label: "Cat", type: "window", img: "assets/images/cat-oiiaoiia-cat-icon.png", desc: "쓸데없는 춤", iconObjectPosition: "38% 50%" },
+	{ id: "cat", label: "Cat", type: "window", img: "assets/images/cat-oiiaoiia-cat-icon.png", desc: "쓸데없는 춤", iconObjectPosition: "38% 50%", iconTint: "#92786e" },
 ];
 
 /* ===================================================================
@@ -287,8 +287,9 @@ function wrapAsWidgetApp(id, label, widgetEl) {
 /* ---------------- 앱 아이콘 ---------------- */
 
 function buildIconFace(app) {
-	const face = el("div", "app-icon");
+	const face = el("div", "app-icon icon-glass");
 	if (app.bg) face.style.background = app.bg;
+	face.style.setProperty("--icon-tint", app.iconTint || (/^#/.test(app.bg || "") ? app.bg : "#a8a9b4"));
 	if (app.img) {
 		const img = document.createElement("img");
 		img.src = app.img;
@@ -305,7 +306,7 @@ function buildIconFace(app) {
 }
 
 function buildFolderFace(folderKey) {
-	const face = el("div", "app-icon is-folder");
+	const face = el("div", "app-icon icon-glass is-folder");
 	const minis = el("div", "folder-minis");
 	const items = FOLDERS[folderKey].items;
 	for (let i = 0; i < 9; i++) {
@@ -362,10 +363,11 @@ function folderBody(folderKey) {
 		a.rel = "noreferrer";
 		let face;
 		if (item.img) {
-			face = el("div", "app-icon", `<img src="${item.img}" alt="" loading="lazy" />`);
+			face = el("div", "app-icon icon-glass", `<img src="${item.img}" alt="" loading="lazy" />`);
 		} else {
-			face = el("div", "app-icon letter-tile", item.letter);
+			face = el("div", "app-icon icon-glass letter-tile", item.letter);
 			face.style.background = item.color || "#8a93a2";
+			face.style.setProperty("--icon-tint", item.color || "#8a93a2");
 		}
 		a.appendChild(face);
 		a.appendChild(el("span", "app-label", item.title));

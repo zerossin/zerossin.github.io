@@ -671,35 +671,11 @@ html.no-lock .lockscreen {
 	align-items: center;
 	justify-content: center;
 	background: linear-gradient(150deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.55));
-	/* 테두리는 ::after가 그린다 — border 자체는 두께만 맞춰두는 투명
-	   자리표시자. 폴더 아이콘처럼 이 background를 통째로 덮어써도
-	   테두리는 별도 레이어라 안 깨진다. */
+	/* Shared color-aware finish lives in icon-glass.css. */
 	border: 1px solid transparent;
 	box-shadow:
-		0 8px 18px rgba(29, 29, 31, 0.1),
-		inset 0 1px 0 rgba(255, 255, 255, 0.85);
+		0 8px 18px rgba(29, 29, 31, 0.1);
 	transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
-}
-
-/* 테두리를 사방 전부 밝게 두면 두꺼워 보이니, 평소엔 아주 얇고 옅게 —
-   빛이 왼쪽 위에서 들어와 오른쪽 아래로 살짝 반사되는 느낌만 두 모서리
-   부근에 밝게 줘서 입체감을 낸다. mask로 링 모양만 남기는 표준 기법이라
-   .app-icon 자신의 background(폴더 등에서 덮어쓰는 것 포함)와 무관하다. */
-.app-icon::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	border-radius: inherit;
-	padding: 1px;
-	background: linear-gradient(135deg,
-		rgba(255, 255, 255, 0.95) 0%,
-		rgba(255, 255, 255, 0.1) 25%,
-		rgba(255, 255, 255, 0.1) 75%,
-		rgba(255, 255, 255, 0.95) 100%);
-	-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-	-webkit-mask-composite: xor;
-	mask-composite: exclude;
-	pointer-events: none;
 }
 
 .app-icon svg {
