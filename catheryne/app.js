@@ -17,7 +17,7 @@ export function selectInstallerUrl(releases) {
  return null;
 }
 const korean = {
- skip:'본문으로 이동', guide:'사용 안내', headline:'원신 여정에, ChatGPT와 함께.', intro:'계정 관리부터 육성, 일상, 플레이까지. 원신을 위한 Windows 동반자.', releases:'릴리스', start:'사용 안내',
+ skip:'본문으로 이동', guide:'사용 안내', headline:'원신 여정에, ChatGPT와 함께.', introScope:'계정 관리부터 육성, 일상, 플레이까지.', introCompanion:'원신을 위한 Windows\u00a0동반자.', releases:'릴리스', start:'사용 안내',
  aiTitle:'ChatGPT', aiBody:'육성을 물어보고 플레이 도움을 받으세요.',
  accountTitle:'계정·육성', accountBody:'보유 캐릭터와 장비를 살펴보고 육성을 계획하세요.',
  toolsTitle:'편의 기능', toolsBody:'캡처·레진·일정·화면 설정·모드를 한곳에서 관리하세요.',
