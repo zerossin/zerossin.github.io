@@ -2,7 +2,8 @@
 
 `app-background.webp` is a small decorative composition of the approved real
 app captures (capabilities chat, the first Spiral Abyss capture, primogem ledger).
-It stays behind the existing mascot; copy, actions and feature layout are retained.
+It is the main visual beside the copy on desktop and below it on mobile.
+The copy, actions and feature layout are retained.
 The capture sources are the Catheryne promotion assets in zerossin-games.
 
 `catheryne-bold.woff2` is a subset of the app's NanumGothic Bold for this static

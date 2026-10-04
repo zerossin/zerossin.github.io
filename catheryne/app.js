@@ -29,7 +29,6 @@ if (typeof document !== 'undefined') {
  if (lang === 'ko') {
   document.querySelector('nav').setAttribute('aria-label', '주 메뉴');
   document.querySelector('.features').setAttribute('aria-label', '주요 기능');
-  document.querySelector('.hero-art img').alt = '캣서린 마스코트';
   document.querySelector('.brand').href = '?lang=ko';
   document.querySelectorAll('[data-text]').forEach(element => {
    const value = korean[element.dataset.text];
