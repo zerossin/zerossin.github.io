@@ -100,7 +100,7 @@ img {
   font-weight:700
 }
 
-.header nav a:hover,.footer a:hover {
+.header nav a:hover {
   color:var(--accent)
 }
 
@@ -229,18 +229,6 @@ h1 {
   margin:0
 }
 
-.footer {
-  margin-top: auto;
-  border-top:1px solid var(--line);
-  display:flex;
-  gap:24px;
-  align-items:center;
-  padding-top:26px;
-  padding-bottom:32px;
-  font-size:13px;
-  color:var(--muted)
-}
-
 html[lang=ko] .tagline,html[lang=ko] .intro,html[lang=ko] article {
   word-break:keep-all
 }
@@ -260,9 +248,7 @@ html[lang=ko] .tagline,html[lang=ko] .intro,html[lang=ko] article {
   #language {
     padding-left:20px
   }
-  .footer {
-    flex-wrap:wrap
-  }
+
 }
 
 @media(max-width:620px) {
@@ -319,10 +305,7 @@ html[lang=ko] .tagline,html[lang=ko] .intro,html[lang=ko] article {
     grid-template-columns:1fr;
     gap:24px
   }
-  .footer {
-    padding-top:22px;
-    gap:20px
-  }
+
   .header nav>a:first-child {
     display:none
   }
@@ -340,3 +323,4 @@ html[lang=ko] .tagline,html[lang=ko] .intro,html[lang=ko] article {
   }
 }
 
+.site-footer-container { --zerossin-footer-muted: var(--muted); --zerossin-footer-line: var(--line); --zerossin-footer-ink: var(--ink); }

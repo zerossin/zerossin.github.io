@@ -21,13 +21,14 @@ const korean = {
  aiTitle:'ChatGPT', aiBody:'육성을 물어보고 플레이 도움을 받으세요.',
  accountTitle:'계정·육성', accountBody:'보유 캐릭터와 장비를 살펴보고 육성을 계획하세요.',
  toolsTitle:'편의 기능', toolsBody:'캡처·레진·일정·화면 설정·모드를 한곳에서 관리하세요.',
- games:'게임'
+ games:'게임', footerHomepage:'홈페이지', footerContact:'문의', footerGames:'게임'
 };
 if (typeof document !== 'undefined') {
  const lang = new URL(location.href).searchParams.get('lang') === 'ko' ? 'ko' : 'en';
  document.documentElement.lang = lang;
  if (lang === 'ko') {
   document.querySelector('nav').setAttribute('aria-label', '주 메뉴');
+  document.querySelector('.zerossin-footer nav').setAttribute('aria-label', '사이트 정보');
   document.querySelector('.features').setAttribute('aria-label', '주요 기능');
   document.querySelector('.brand').href = '?lang=ko';
   document.querySelectorAll('[data-text]').forEach(element => {

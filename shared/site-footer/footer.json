@@ -1,0 +1,15 @@
+{
+  "owner": "Zerossin",
+  "links": [
+    { "href": "https://zerossin.com/", "label": { "ko": "홈페이지", "en": "Homepage" } },
+    { "href": "https://github.com/zerossin", "label": { "ko": "GitHub", "en": "GitHub" } },
+    { "href": "mailto:zerossin.dev@gmail.com", "label": { "ko": "문의", "en": "Contact" } }
+  ],
+  "projects": {
+    "homepage": { "repository": "zerossin.github.io", "page": "index.html", "css": "assets/css/site-footer.css", "locale": "ko" },
+    "catheryne": { "repository": "zerossin.github.io", "page": "catheryne/index.html", "css": "catheryne/site-footer.css", "locale": "en", "links": [{ "href": "https://game.zerossin.com/", "label": { "ko": "게임", "en": "Games" } }] },
+    "games": { "repository": "zerossin-games", "module": "frontend/src/platform/site-footer.js", "css": "frontend/src/platform/site-footer.css", "locale": "ko" },
+    "wikirim": { "repository": "wikirim", "module": "frontend/lib/site-footer.ts", "css": "frontend/app/site-footer.css", "locale": "ko", "contact": "/support", "links": [{ "href": "/terms", "label": { "ko": "AI 연결 이용조건", "en": "AI connection terms" } }, { "href": "/privacy", "label": { "ko": "개인정보 처리 안내", "en": "Privacy" } }] },
+    "eodilkkayong": { "repository": "eodilkkayong", "page": "index.html", "css": "css/site-footer.css", "locale": "ko", "retainNotices": true }
+  }
+}

@@ -197,15 +197,7 @@ button {
 	letter-spacing: 0.02em;
 }
 
-.os-footer {
-	margin-top: 56px;
-	text-align: center;
-	font-size: 0.75rem;
-	color: rgba(255, 255, 255, 0.45);
-}
 
-.os-footer a { text-decoration: none; }
-.os-footer a:hover { text-decoration: underline; }
 
 .os-clock.os-done-btn {
 	cursor: pointer;
@@ -1186,3 +1178,5 @@ html.no-lock .lockscreen {
 @media (prefers-reduced-motion: reduce) {
 	.os-window, .os-backdrop, .home-grid, .app-icon { transition: none !important; }
 }
+
+.os-footer-container { --zerossin-footer-ink: #f5f5f7; }
