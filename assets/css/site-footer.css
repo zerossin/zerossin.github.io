@@ -1,10 +1,11 @@
-/* Generated from zerossin.github.io/shared/site-footer (sha256:d7cbbcb5dd06). Do not edit; run sync.mjs. */
+/* Generated from zerossin.github.io/shared/site-footer (sha256:5b27f4e30798). Do not edit; run sync.mjs. */
 /* Canonical Zerossin footer. Host themes may map these tokens to their own palette. */
 :root {
   --zerossin-footer-font: .8125rem;
   --zerossin-footer-leading: 1.5;
   --zerossin-footer-top: 3rem;
-  --zerossin-footer-padding: 1rem;
+  --zerossin-footer-padding-top: .75rem;
+  --zerossin-footer-padding-bottom: 1rem;
   --zerossin-footer-gap: 1.5rem;
   --zerossin-footer-row-gap: .5rem;
   --zerossin-footer-touch: 2.75rem;
@@ -22,7 +23,7 @@
   justify-content: space-between;
   gap: var(--zerossin-footer-row-gap) var(--zerossin-footer-gap);
   margin-top: var(--zerossin-footer-top);
-  padding-block: var(--zerossin-footer-padding);
+  padding-block: var(--zerossin-footer-padding-top) var(--zerossin-footer-padding-bottom);
   border-top: var(--zerossin-footer-line-width) solid var(--zerossin-footer-line);
   color: var(--zerossin-footer-muted);
   font-size: var(--zerossin-footer-font);
