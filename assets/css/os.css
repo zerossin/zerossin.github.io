@@ -4,7 +4,12 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+	min-height: 100%;
+	-webkit-text-size-adjust: 100%;
+	background-color: #060814;
+	color-scheme: dark;
+}
 
 :root {
 	/* single source of truth: every app icon is exactly this square,
@@ -19,14 +24,17 @@ body {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
 		"Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
 	color: rgba(255, 255, 255, 0.85);
-	background: linear-gradient(180deg,
+	background-color: #060814;
+	background-image: linear-gradient(180deg,
 		#060814 0%,
 		#0c1130 22%,
 		#1a1f47 42%,
 		#33305f 62%,
 		#5c3f66 80%,
 		#2c2a4a 100%);
+	background-repeat: no-repeat;
 	min-height: 100vh;
+	min-height: 100dvh;
 	position: relative;
 }
 
@@ -47,7 +55,7 @@ a { color: inherit; }
 .sky {
 	position: fixed;
 	inset: 0;
-	z-index: -1;
+	z-index: 0;
 	overflow: hidden;
 	pointer-events: none;
 }
@@ -181,6 +189,8 @@ button {
    ---------------------------------------------------------------- */
 
 #os {
+	position: relative;
+	z-index: 1;
 	max-width: 1560px;
 	margin: 0 auto;
 	padding: 0 clamp(16px, 3vw, 48px);
