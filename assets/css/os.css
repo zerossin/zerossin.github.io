@@ -569,6 +569,7 @@ html.no-lock .lockscreen {
 
 .about-links {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 }
 
@@ -1139,16 +1140,14 @@ html.no-lock .lockscreen {
 
 	.about-name { font-size: 1.05rem; }
 
-	.about-intro { display: none; }
-
 	.about-head { gap: 10px; flex: 1; }
 
 	.widget-about {
-		flex-direction: row;
-		align-items: center;
+		flex-direction: column;
+		align-items: stretch;
 	}
 
-	.about-links { flex-direction: column; gap: 5px; }
+	.about-links { gap: 5px; }
 
 	.about-links a { padding: 3px 9px; font-size: 0.68rem; }
 

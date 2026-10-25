@@ -5,10 +5,7 @@
 /* ---------------- 기본 정보 ---------------- */
 
 const SITE = {
-	name: "Zerossin",
-	intro: "경희대학교 졸업.\n이것저것 만들며 배우고 있습니다.",
 	github: "https://github.com/zerossin",
-	email: "zerossin.dev@gmail.com",
 	blog: "#",       // Tistory 링크가 생기면 채우기
 	instagram: "#",  // Instagram 링크가 생기면 채우기
 };
@@ -232,6 +229,8 @@ const APPS = [
    =================================================================== */
 
 const home = document.getElementById("home");
+home.querySelector('.about-links a[href="https://github.com/zerossin"]').insertAdjacentHTML("afterbegin", ICONS.github.replace('fill="#fff"', 'fill="currentColor"'));
+home.querySelector('.about-links a[href^="mailto:"]').insertAdjacentHTML("afterbegin", ICONS.mail);
 
 function el(tag, className, html) {
 	const node = document.createElement(tag);
@@ -241,25 +240,6 @@ function el(tag, className, html) {
 }
 
 /* ---------------- 위젯 ---------------- */
-
-function renderAboutWidget() {
-	const w = el("section", "widget widget-about");
-	w.innerHTML = `
-		<div class="widget-title">About</div>
-		<div class="about-head">
-			<img class="about-avatar" src="assets/images/profile.jpg" alt="${SITE.name} 프로필" />
-			<div>
-				<div class="about-name">${SITE.name}</div>
-			</div>
-		</div>
-		<p class="about-intro">${SITE.intro.replace(/\n/g, "<br>")}</p>
-		<div class="about-links">
-			<a href="${SITE.github}" target="_blank" rel="noreferrer">${ICONS.github.replace('fill="#fff"', 'fill="currentColor"')}GitHub</a>
-			<a href="mailto:${SITE.email}">${ICONS.mail}Email</a>
-		</div>
-	`;
-	return w;
-}
 
 function renderSkillWidget() {
 	const w = el("section", "widget widget-skill");
@@ -1030,7 +1010,7 @@ function initReorder() {
 // 위젯도 일반 앱과 똑같이 하나의 순서 목록에 들어간다 — 재배치/저장 로직이
 // "위젯이면 이렇게, 앱이면 저렇게" 나뉘지 않고 전부 이 id 목록 하나로 처리된다.
 const WIDGETS = [
-	{ id: "about", label: "About", render: renderAboutWidget },
+	{ id: "about", label: "About" },
 	{ id: "skill", label: "Skill", render: renderSkillWidget },
 ];
 
@@ -1039,7 +1019,9 @@ const orderedIds = loadOrder(allIds);
 orderedIds.forEach((id) => {
 	const widget = WIDGETS.find((w) => w.id === id);
 	if (widget) {
-		home.appendChild(wrapAsWidgetApp(widget.id, widget.label, widget.render()));
+		// 정적 About 본문을 그대로 옮겨 저장된 순서와 재배치 동작을 유지한다.
+		const existing = home.querySelector(`[data-app-id="${id}"]`);
+		home.appendChild(existing || wrapAsWidgetApp(widget.id, widget.label, widget.render()));
 		return;
 	}
 	const app = APPS.find((a) => a.id === id);
