@@ -25,6 +25,26 @@ function expectedUrl(file) {
 
 const attr = (tag, name) => new RegExp(`${name}\s*=\s*"([^"]*)"`, 'i').exec(tag)?.[1]
 
+// 홈 소개는 JavaScript 실행 여부와 무관하게 같은 본문을 제공한다.
+const home = readFileSync(join(root, 'index.html'), 'utf8')
+  .replace(/<(script|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+if (!/<h1\b[^>]*>제로신 \(Zerossin\)<\/h1>/.test(home)) {
+  errors.push('index.html: 정적 h1 제로신 (Zerossin) 없음')
+}
+if (!/<p\b[^>]*class="about-intro"[^>]*>[^<]*제로신/.test(home)) {
+  errors.push('index.html: 정적 소개 문장 없음')
+}
+for (const [href, label] of [
+  ['https://wikirim.com', '위키림'],
+  ['https://game.zerossin.com/games', '제로신 게임즈'],
+  ['/catheryne/', 'Catheryne'],
+]) {
+  if (![...home.matchAll(/<a\b[^>]*>[^<]*<\/a>/g)].some(([tag]) =>
+    attr(tag, 'href') === href && tag.includes(`>${label}</a>`))) {
+    errors.push(`index.html: 정적 프로젝트 링크 ${label} 없음`)
+  }
+}
+
 for (const file of htmlFiles(root)) {
   const html = readFileSync(file, 'utf8')
   const want = expectedUrl(file)

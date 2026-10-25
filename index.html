@@ -25,8 +25,9 @@
 				}
 			} catch (e) {}
 		</script>
-		<link rel="stylesheet" href="assets/css/os.css?v=11eee04c2aae" />
+		<link rel="stylesheet" href="assets/css/os.css?v=26588dbb4c5b" />
 		<link rel="stylesheet" href="assets/css/icon-glass.css?v=ed97de15caa7" />
+		<noscript><style>.lockscreen { display: none; }</style></noscript>
 
 		<link rel="shortcut icon" href="favicon.ico?v=13871df7d6da">
 		<link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png?v=5bf37c216e5e">
@@ -78,12 +79,26 @@
 			</header>
 
 			<main class="home-grid" id="home">
-				<noscript>
-					<p style="grid-column: 1 / -1; text-align: center;">
-						이 페이지는 JavaScript가 필요합니다.
-						<a href="https://github.com/zerossin">GitHub</a>에서 프로젝트를 볼 수 있습니다.
-					</p>
-				</noscript>
+				<div class="app widget-slot" data-app-id="about">
+					<section class="widget widget-about" aria-labelledby="about-name">
+						<div class="widget-title">About</div>
+						<div class="about-head">
+							<img class="about-avatar" src="assets/images/profile.jpg?v=9c0125534fc3" alt="제로신 프로필" />
+							<h1 class="about-name" id="about-name">제로신 (Zerossin)</h1>
+						</div>
+						<p class="about-intro">경희대학교를 졸업한 제로신의 개인 홈페이지입니다.<br />이것저것 만들며 배우고, 프로젝트와 개발 도구, 웹게임을 소개합니다.</p>
+						<nav class="about-links" aria-label="주요 프로젝트">
+							<a href="https://wikirim.com">위키림</a>
+							<a href="https://game.zerossin.com/games">제로신 게임즈</a>
+							<a href="/catheryne/">Catheryne</a>
+						</nav>
+						<div class="about-links">
+							<a href="https://github.com/zerossin" target="_blank" rel="noreferrer">GitHub</a>
+							<a href="mailto:zerossin.dev@gmail.com">Email</a>
+						</div>
+					</section>
+					<span class="app-label">About</span>
+				</div>
 			</main>
 
 			<!-- zerossin-footer:start -->
@@ -116,7 +131,7 @@
 			</button>
 		</div>
 
-		<script src="assets/js/os.js?v=b3af3e813b09"></script>
+		<script src="assets/js/os.js?v=595f55480c6a"></script>
 
 	</body>
 </html>
