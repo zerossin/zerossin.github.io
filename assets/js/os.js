@@ -39,7 +39,7 @@ const FOLDERS = {
 		label: "Project",
 		desc: "협업 프로젝트",
 		items: [
-			{ href: "https://github.com/softeerbootcamp-8th/DE_team2-GangnamguUmBokDong", img: "assets/images/logo-ddareungi-dashboard.png", title: "따릉이 대시보드" },
+			{ href: "https://github.com/zerossin/DE_team2-GangnamguUmBokDong", img: "assets/images/logo-ddareungi-dashboard.png", title: "따릉이 대시보드" },
 			{ href: "https://github.com/zerossin/Disa-Project", img: "assets/images/logo_disa_project.png", title: "DISA Project" },
 			{ href: "https://github.com/VRTempleStay/VR-TempleStay", letter: "VR", color: "#4d8fe2", title: "VR-TempleStay" },
 		],
